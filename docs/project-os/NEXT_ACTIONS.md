@@ -2,17 +2,20 @@
 
 ## Sıradaki işler
 
-1. GitHub initial setup dosyalarını yükle.
-2. Milestone 01 dosya yapısını kontrol et.
-3. Milestone 01 Scene & Camera prototipini tarayıcıda çalıştır.
-4. Console hatası varsa düzelt.
-5. Milestone 01 QA checklist çalıştır.
+1. Milestone 02 update dosyalarını GitHub'a yükle.
+2. Local dosyalara aynı update'i uygula.
+3. `game` klasöründe local server başlat.
+4. Grid ve world object testlerini çalıştır.
+5. Hover / selection panel davranışını kontrol et.
 
-## Kod sırası
+## Milestone 02 testleri
 
-1. /game/index.html
-2. /game/css/style.css
-3. /game/js/main.js
-4. /game/js/render/scene.js
-5. /game/js/render/camera.js
-6. /game/js/render/lighting.js
+- Grid görünüyor mu?
+- NEXUS Core görünüyor mu?
+- Iron Deposit görünüyor mu?
+- Copper Deposit görünüyor mu?
+- Mouse hover efekti çalışıyor mu?
+- Tıklayınca sağ panelde obje bilgisi çıkıyor mu?
+- Q/E kamera dönüşü hâlâ çalışıyor mu?
+- Mouse wheel zoom hâlâ çalışıyor mu?
+- Drag pan hâlâ çalışıyor mu?

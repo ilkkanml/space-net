@@ -1,26 +1,33 @@
 # ACTIVE_MILESTONE.md
 
 ## Aktif Milestone
-Milestone 01 — Scene & Camera
+Milestone 02 — Grid & World Objects
 
 ## Amaç
-Tarayıcıda açılan, Three.js ile çalışan, orthographic izometrik kamera kullanan, basit asteroid zeminli ilk sahneyi kurmak.
+Sahnede görsel grid, temel dünya objeleri ve seçilebilir nesne sistemini kurmak.
 
 ## Olacaklar
-- index.html
-- css/style.css
-- js/main.js
-- js/render/scene.js
-- js/render/camera.js
-- js/render/lighting.js
-- Three.js sahnesi
-- Orthographic kamera
-- Asteroid ground placeholder
-- Kamera pan / zoom
-- Q/E ile 90 derece kamera dönüşü
+- 32x32 görsel grid
+- NEXUS Core placeholder
+- Iron Deposit
+- Copper Deposit
+- Object hover feedback
+- Object selection feedback
+- Raycasting ile tıklama seçimi
+- Sağ panelde seçili obje bilgisi
+- worldObjectsData yapısı
 
 ## Olmayacaklar
-Grid, NEXUS sistemi, kaynak toplama, build menu, makine, üretim, conveyor, storage, görev, E.V.A., save/load.
+- Kaynak toplama
+- Inventory
+- Build menu
+- Makine yerleştirme
+- Üretim
+- Conveyor mantığı
+- Storage mantığı
+- Görev sistemi
+- E.V.A.
+- Save/load
 
 ## Kabul kriteri
-Oyun tarayıcıda açılır, sahne görünür, kamera hareket eder, zoom çalışır, Q/E dönüşü çalışır, console’da kritik hata yoktur.
+Oyun tarayıcıda açılır, grid görünür, NEXUS Core / Iron Deposit / Copper Deposit görünür, mouse ile üzerine gelince hover efekti çalışır, tıklanınca sağ panelde obje bilgisi çıkar, kamera kontrolleri bozulmaz.

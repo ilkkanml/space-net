@@ -1,11 +1,11 @@
 import * as THREE from "three";
 
-const CAMERA_DISTANCE = 42;
-const CAMERA_HEIGHT = 32;
+const CAMERA_DISTANCE = 46;
+const CAMERA_HEIGHT = 34;
 
 export function createCamera(width, height) {
   const aspect = width / height;
-  const viewSize = 34;
+  const viewSize = 38;
 
   const camera = new THREE.OrthographicCamera(
     (-viewSize * aspect) / 2,
@@ -25,7 +25,8 @@ export function createCamera(width, height) {
 
 export function resizeCamera(camera, width, height) {
   const aspect = width / height;
-  const viewSize = 34 / camera.zoom;
+  const baseViewSize = 38;
+  const viewSize = baseViewSize / camera.zoom;
 
   camera.left = (-viewSize * aspect) / 2;
   camera.right = (viewSize * aspect) / 2;
@@ -45,7 +46,7 @@ export function panCamera(camera, deltaX, deltaY) {
   const right = new THREE.Vector3(Math.cos(angle), 0, -Math.sin(angle));
   const forward = new THREE.Vector3(Math.sin(angle), 0, Math.cos(angle));
 
-  const panScale = 0.035 / camera.zoom;
+  const panScale = 0.04 / camera.zoom;
   camera.userData.target.addScaledVector(right, -deltaX * panScale);
   camera.userData.target.addScaledVector(forward, -deltaY * panScale);
 

@@ -51,6 +51,13 @@ body,
   color: rgba(233, 246, 255, 0.78);
 }
 
+.selection-panel {
+  right: 16px;
+  bottom: 16px;
+  width: 280px;
+  min-height: 120px;
+}
+
 .label {
   color: #6ee7ff;
   font-size: 11px;
@@ -61,4 +68,14 @@ body,
 .value {
   margin-top: 3px;
   font-weight: 700;
+}
+
+.muted {
+  margin-top: 4px;
+  color: rgba(233, 246, 255, 0.62);
+}
+
+.description {
+  margin-top: 10px;
+  color: rgba(233, 246, 255, 0.78);
 }
