@@ -63,29 +63,27 @@ export function loadRecipeInputFromInventory(building) {
     return false;
   }
 
-  const canLoad = Object.entries(recipe.input).every(([resourceId, amount]) => {
-    return (building.machine.inputBuffer[resourceId] ?? 0) + amount <= building.machine.inputCapacity;
-  });
+  let loadedBatches = 0;
 
-  if (!canLoad) {
-    statusCallback?.("Input buffer full");
+  while (canLoadOneRecipeBatch(building.machine, recipe) && hasInventoryForRecipe(recipe)) {
+    Object.entries(recipe.input).forEach(([resourceId, amount]) => {
+      removeResource(resourceId, amount);
+      building.machine.inputBuffer[resourceId] = (building.machine.inputBuffer[resourceId] ?? 0) + amount;
+    });
+
+    loadedBatches += 1;
+  }
+
+  if (loadedBatches === 0) {
+    if (!canLoadOneRecipeBatch(building.machine, recipe)) {
+      statusCallback?.("Input buffer full");
+    } else {
+      statusCallback?.("Not enough inventory resources");
+    }
     return false;
   }
 
-  const hasResources = Object.entries(recipe.input).every(([resourceId, amount]) => {
-    return gameState.resources[resourceId] >= amount;
-  });
-
-  if (!hasResources) {
-    statusCallback?.("Not enough inventory resources");
-    return false;
-  }
-
-  Object.entries(recipe.input).forEach(([resourceId, amount]) => {
-    removeResource(resourceId, amount);
-    building.machine.inputBuffer[resourceId] = (building.machine.inputBuffer[resourceId] ?? 0) + amount;
-  });
-
+  statusCallback?.(`Loaded ${loadedBatches} recipe batch${loadedBatches > 1 ? "es" : ""}`);
   notifyStateChanged();
   return true;
 }
@@ -194,6 +192,18 @@ function hasOutputSpace(machine, recipe) {
   const currentTotal = getBufferTotal(machine.outputBuffer);
   const outputTotal = Object.values(recipe.output).reduce((sum, amount) => sum + amount, 0);
   return currentTotal + outputTotal <= machine.outputCapacity;
+}
+
+function canLoadOneRecipeBatch(machine, recipe) {
+  const currentInputTotal = getBufferTotal(machine.inputBuffer);
+  const recipeInputTotal = Object.values(recipe.input).reduce((sum, amount) => sum + amount, 0);
+  return currentInputTotal + recipeInputTotal <= machine.inputCapacity;
+}
+
+function hasInventoryForRecipe(recipe) {
+  return Object.entries(recipe.input).every(([resourceId, amount]) => {
+    return gameState.resources[resourceId] >= amount;
+  });
 }
 
 function getBufferTotal(buffer) {

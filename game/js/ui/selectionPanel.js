@@ -31,7 +31,7 @@ export function updateSelectionPanel(selection, onCollectResource) {
     return;
   }
 
-  const data = selection.userData?.worldObject || selection.userData?.building || selection;
+  const data = getSelectionData(selection);
 
   nameEl.textContent = data.name;
   typeEl.textContent = `${data.type} • ${data.size ?? "Object"}`;
@@ -51,9 +51,20 @@ export function updateSelectionPanel(selection, onCollectResource) {
 }
 
 export function refreshSelectionPanel() {
-  if (currentSelection) {
-    updateSelectionPanel(currentSelection, currentCollectAction);
+  if (!currentSelection) return;
+
+  const data = getSelectionData(currentSelection);
+
+  // Hotfix:
+  // Panelin tamamını ve butonları sürekli yeniden çizmek tıklama kaçırıyordu.
+  // Periyodik refresh artık yalnızca machine info alanını güncelliyor.
+  if (data.machine) {
+    renderMachineInfo(data);
   }
+}
+
+function getSelectionData(selection) {
+  return selection.userData?.worldObject || selection.userData?.building || selection;
 }
 
 function renderMachineInfo(data) {
@@ -75,19 +86,19 @@ function renderMachineActions(data) {
       const recipe = recipes[recipeId];
       addAction(`Set Recipe: ${recipe.name}`, () => {
         setRecipe(data, recipeId);
-        refreshSelectionPanel();
+        renderMachineInfo(data);
       }, "secondary");
     });
 
     addAction("Load Input From Inventory", () => {
       loadRecipeInputFromInventory(data);
-      refreshSelectionPanel();
+      renderMachineInfo(data);
     });
   }
 
   addAction("Collect Machine Output", () => {
     collectMachineOutput(data);
-    refreshSelectionPanel();
+    renderMachineInfo(data);
   });
 }
 
