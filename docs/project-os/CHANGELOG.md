@@ -3,20 +3,22 @@
 ## v0.1.0-m01 — Scene & Camera Passed
 
 - Milestone 01 test edildi ve geçti.
-- Three.js sahnesi çalıştı.
-- Orthographic kamera çalıştı.
-- Pan / zoom / Q-E kamera dönüşü çalıştı.
-- Local server üzerinden oyun açıldı.
 
 ## v0.1.0-m02 — Grid & World Objects Passed
 
-- 32x32 grid göründü.
-- NEXUS Core, Iron Deposit ve Copper Deposit göründü.
+- Grid, NEXUS Core, Iron Deposit ve Copper Deposit göründü.
 - Hover ve selection panel çalıştı.
-- Kamera kontrolleri bozulmadı.
 
-## v0.1.0-m03 — Game State & Resources Started
+## v0.1.0-m03 — Game State & Resources Passed
 
-- Aktif milestone Milestone 03 olarak güncellendi.
-- Merkezi gameState ve resource bar sistemi için update paketi hazırlandı.
-- Manuel Iron Ore / Copper Ore toplama sistemi eklendi.
+- Resource bar çalıştı.
+- Iron Deposit üzerinden Iron Ore toplandı.
+- Copper Deposit üzerinden Copper Ore toplandı.
+- Merkezi gameState çalıştı.
+
+## v0.1.0-m04 — Building Placement Started
+
+- Aktif milestone Milestone 04 olarak güncellendi.
+- Build Menu sistemi eklendi.
+- Basic Miner, Basic Processor ve Small Storage placement sistemi hazırlandı.
+- Cost check ve occupancy check eklendi.

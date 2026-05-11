@@ -2,7 +2,8 @@ import { resourceOrder } from "../data/resources.js";
 
 export const gameState = {
   version: "0.1.0",
-  resources: Object.fromEntries(resourceOrder.map((resourceId) => [resourceId, 0]))
+  resources: Object.fromEntries(resourceOrder.map((resourceId) => [resourceId, 0])),
+  buildings: []
 };
 
 const listeners = new Set();
@@ -30,6 +31,26 @@ export function removeResource(resourceId, amount) {
 
 export function hasResource(resourceId, amount) {
   return getResource(resourceId) >= amount;
+}
+
+export function canAfford(cost) {
+  return Object.entries(cost).every(([resourceId, amount]) => hasResource(resourceId, amount));
+}
+
+export function spendCost(cost) {
+  if (!canAfford(cost)) return false;
+
+  Object.entries(cost).forEach(([resourceId, amount]) => {
+    gameState.resources[resourceId] -= amount;
+  });
+
+  notifyStateChanged();
+  return true;
+}
+
+export function addBuilding(building) {
+  gameState.buildings.push(building);
+  notifyStateChanged();
 }
 
 export function subscribeToState(listener) {

@@ -21,7 +21,8 @@ body,
 }
 
 .hud,
-.resource-bar {
+.resource-bar,
+.build-menu {
   position: fixed;
   z-index: 10;
   padding: 12px 14px;
@@ -86,6 +87,52 @@ body,
   margin-left: auto;
   font-weight: 700;
   color: #ffffff;
+}
+
+.build-menu {
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  align-items: stretch;
+}
+
+.build-button {
+  min-width: 150px;
+  padding: 9px 10px;
+  border: 1px solid rgba(110, 231, 255, 0.28);
+  border-radius: 10px;
+  background: rgba(29, 167, 198, 0.16);
+  color: #e9f6ff;
+  cursor: pointer;
+  text-align: left;
+}
+
+.build-button:hover:not(:disabled),
+.build-button.active {
+  background: rgba(29, 167, 198, 0.32);
+  border-color: rgba(110, 231, 255, 0.65);
+}
+
+.build-button:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+}
+
+.build-title {
+  font-weight: 700;
+}
+
+.build-cost {
+  margin-top: 3px;
+  font-size: 11px;
+  color: rgba(233, 246, 255, 0.65);
+}
+
+.cancel-build {
+  min-width: 76px;
+  text-align: center;
 }
 
 .selection-panel {

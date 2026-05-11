@@ -7,25 +7,27 @@ const actionButtonEl = document.querySelector("#selection-action");
 
 let actionHandler = null;
 
-export function updateSelectionPanel(worldObject, onAction) {
+export function updateSelectionPanel(selection, onAction) {
   actionHandler = null;
   actionButtonEl.classList.add("hidden");
   actionButtonEl.textContent = "";
 
-  if (!worldObject) {
+  if (!selection) {
     nameEl.textContent = "None";
     typeEl.textContent = "Click a world object";
     descriptionEl.textContent = "";
     return;
   }
 
-  nameEl.textContent = worldObject.name;
-  typeEl.textContent = `${worldObject.type} • ${worldObject.size}`;
-  descriptionEl.textContent = worldObject.description;
+  const data = selection.userData?.worldObject || selection.userData?.building || selection;
 
-  if (worldObject.collectible && worldObject.resourceId) {
-    const resource = resources[worldObject.resourceId];
-    actionButtonEl.textContent = `Collect +${worldObject.collectionAmount} ${resource.name}`;
+  nameEl.textContent = data.name;
+  typeEl.textContent = `${data.type} • ${data.size ?? "Object"}`;
+  descriptionEl.textContent = data.description ?? "";
+
+  if (data.collectible && data.resourceId) {
+    const resource = resources[data.resourceId];
+    actionButtonEl.textContent = `Collect +${data.collectionAmount} ${resource.name}`;
     actionButtonEl.classList.remove("hidden");
     actionHandler = onAction;
   }

@@ -6,7 +6,17 @@ import { createGrid } from "./world/grid.js";
 import { createWorldObjects, setObjectHover, setObjectSelected } from "./world/worldObjects.js";
 import { updateSelectionPanel } from "./ui/selectionPanel.js";
 import { initResourceBar } from "./ui/resourceBar.js";
+import { initBuildMenu, setActiveBuildButton } from "./ui/buildMenu.js";
 import { addResource } from "./core/gameState.js";
+import {
+  initBuildSystem,
+  startPlacement,
+  cancelPlacement,
+  isPlacementActive,
+  updatePlacementPreview,
+  tryPlaceBuilding,
+  getPlacedBuildingFromObject
+} from "./systems/buildSystem.js";
 
 const canvas = document.querySelector("#game-canvas");
 const statusText = document.querySelector("#status-text");
@@ -24,6 +34,7 @@ const scene = createScene();
 const camera = createCamera(window.innerWidth, window.innerHeight);
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
+const groundPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
 
 addLighting(scene);
 createAsteroidGround(scene);
@@ -31,6 +42,26 @@ createGrid(scene);
 initResourceBar();
 
 const { selectableObjects } = createWorldObjects(scene);
+
+initBuildSystem({
+  scene,
+  onStatus: setStatus,
+  onBuildingSelected: (buildingMesh) => {
+    updateSelectionPanel(buildingMesh);
+  }
+});
+
+initBuildMenu({
+  onSelectBuild: (buildingId) => {
+    clearWorldSelection();
+    updateSelectionPanel(null);
+    startPlacement(buildingId);
+  },
+  onCancelBuild: () => {
+    cancelPlacement();
+    setActiveBuildButton(null);
+  }
+});
 
 const clock = new THREE.Clock();
 
@@ -68,6 +99,13 @@ canvas.addEventListener("pointermove", (event) => {
     return;
   }
 
+  if (isPlacementActive()) {
+    const position = getGroundPosition();
+    const depositObject = getWorldObjectUnderPointer();
+    updatePlacementPreview(position, depositObject);
+    return;
+  }
+
   updateHover();
 });
 
@@ -75,10 +113,17 @@ canvas.addEventListener("pointerup", (event) => {
   state.isDragging = false;
   canvas.releasePointerCapture(event.pointerId);
 
-  if (!state.hasDragged) {
-    updatePointer(event);
-    selectObjectUnderPointer();
+  if (state.hasDragged) return;
+
+  updatePointer(event);
+
+  if (isPlacementActive()) {
+    const placed = tryPlaceBuilding(getGroundPosition(), getWorldObjectUnderPointer());
+    if (placed) setActiveBuildButton(null);
+    return;
   }
+
+  selectObjectUnderPointer();
 });
 
 canvas.addEventListener("wheel", (event) => {
@@ -91,6 +136,11 @@ window.addEventListener("keydown", (event) => {
 
   if (key === "q") rotateCamera(camera, -1);
   if (key === "e") rotateCamera(camera, 1);
+
+  if (key === "escape") {
+    cancelPlacement();
+    setActiveBuildButton(null);
+  }
 });
 
 window.addEventListener("resize", () => {
@@ -105,7 +155,14 @@ function updatePointer(event) {
   pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
 }
 
-function getObjectUnderPointer() {
+function getGroundPosition() {
+  raycaster.setFromCamera(pointer, camera);
+  const point = new THREE.Vector3();
+  raycaster.ray.intersectPlane(groundPlane, point);
+  return point;
+}
+
+function getWorldObjectUnderPointer() {
   raycaster.setFromCamera(pointer, camera);
   const hits = raycaster.intersectObjects(selectableObjects, true);
   if (hits.length === 0) return null;
@@ -118,8 +175,23 @@ function getObjectUnderPointer() {
   return object || null;
 }
 
+function getSelectableUnderPointer() {
+  const worldObject = getWorldObjectUnderPointer();
+  if (worldObject) return worldObject;
+
+  raycaster.setFromCamera(pointer, camera);
+  const hits = raycaster.intersectObjects(scene.children, true);
+
+  for (const hit of hits) {
+    const building = getPlacedBuildingFromObject(hit.object);
+    if (building) return building;
+  }
+
+  return null;
+}
+
 function updateHover() {
-  const object = getObjectUnderPointer();
+  const object = getWorldObjectUnderPointer();
 
   if (object === state.hoveredObject) return;
 
@@ -135,15 +207,13 @@ function updateHover() {
 }
 
 function selectObjectUnderPointer() {
-  const object = getObjectUnderPointer();
+  const object = getSelectableUnderPointer();
 
-  if (state.selectedObject) {
-    setObjectSelected(state.selectedObject, false);
-  }
+  clearWorldSelection();
 
   state.selectedObject = object;
 
-  if (state.selectedObject) {
+  if (state.selectedObject?.userData?.worldObject) {
     setObjectSelected(state.selectedObject, true);
     const worldObject = state.selectedObject.userData.worldObject;
 
@@ -151,9 +221,27 @@ function selectObjectUnderPointer() {
       if (!worldObject.collectible) return;
       addResource(worldObject.resourceId, worldObject.collectionAmount);
     });
-  } else {
-    updateSelectionPanel(null);
+
+    return;
   }
+
+  if (state.selectedObject?.userData?.building) {
+    updateSelectionPanel(state.selectedObject);
+    return;
+  }
+
+  updateSelectionPanel(null);
+}
+
+function clearWorldSelection() {
+  if (state.selectedObject?.userData?.worldObject) {
+    setObjectSelected(state.selectedObject, false);
+  }
+  state.selectedObject = null;
+}
+
+function setStatus(message) {
+  statusText.textContent = message;
 }
 
 function animate() {
@@ -169,5 +257,5 @@ function animate() {
   requestAnimationFrame(animate);
 }
 
-statusText.textContent = "Scene ready";
+setStatus("Scene ready");
 animate();

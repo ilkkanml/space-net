@@ -1,33 +1,34 @@
 # ACTIVE_MILESTONE.md
 
 ## Aktif Milestone
-Milestone 03 — Game State & Resources
+Milestone 04 — Building Placement
 
 ## Amaç
-Oyun durumunu merkezi gameState içine almak, v0.1 kaynaklarını tanımlamak, inventory/resource bar göstermek ve Iron/Copper depositlerinden manuel kaynak toplama akışını kurmak.
+Oyuncunun kaynak maliyeti ödeyerek temel binaları grid üzerine yerleştirmesini sağlamak.
 
 ## Olacaklar
-- js/core/gameState.js
-- js/data/resources.js
-- js/ui/resourceBar.js
-- Merkezi inventory state
-- Resource bar UI
-- Iron Ore / Copper Ore / Iron Plate / Copper Wire kaynak tanımları
-- Iron Deposit seçilince manuel +1 Iron Ore toplama
-- Copper Deposit seçilince manuel +1 Copper Ore toplama
-- Kaynak miktarı anlık UI’da güncellenir
-- Selection panel kaynak toplama aksiyonu gösterir
+- Build Menu UI
+- Placement mode
+- Placement preview / ghost
+- Basic Miner
+- Basic Processor
+- Small Storage
+- Cost check
+- Resource spending
+- Occupancy check
+- Basic Miner sadece Iron/Copper deposit üzerine kurulabilir
+- Basic Processor ve Small Storage boş grid alanına kurulabilir
+- Sağ panelde yerleştirilen bina bilgisi gösterilir
+- ESC veya Cancel ile placement iptal edilebilir
 
 ## Olmayacaklar
-- Build menu
-- Makine yerleştirme
-- Otomatik üretim
+- Miner otomatik üretim
 - Processor recipe sistemi
-- Conveyor transfer
-- Storage
+- Conveyor
+- Storage kapasite mantığı
 - Görev sistemi
 - E.V.A.
 - Save/load
 
 ## Kabul kriteri
-Oyun açılır, resource bar görünür, Iron Deposit’ten Iron Ore toplanır, Copper Deposit’ten Copper Ore toplanır, miktarlar anlık güncellenir, sahne/kamera/grid/selection sistemi bozulmaz.
+Yeterli kaynak toplandıktan sonra Basic Miner deposit üzerine kurulabilir. Basic Processor ve Small Storage boş alana kurulabilir. Kaynak maliyeti düşer. Geçersiz alana yerleştirme engellenir. Kamera, grid, selection ve resource bar bozulmaz.
