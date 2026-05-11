@@ -5,6 +5,8 @@ import { addLighting } from "./render/lighting.js";
 import { createGrid } from "./world/grid.js";
 import { createWorldObjects, setObjectHover, setObjectSelected } from "./world/worldObjects.js";
 import { updateSelectionPanel } from "./ui/selectionPanel.js";
+import { initResourceBar } from "./ui/resourceBar.js";
+import { addResource } from "./core/gameState.js";
 
 const canvas = document.querySelector("#game-canvas");
 const statusText = document.querySelector("#status-text");
@@ -26,6 +28,7 @@ const pointer = new THREE.Vector2();
 addLighting(scene);
 createAsteroidGround(scene);
 createGrid(scene);
+initResourceBar();
 
 const { selectableObjects } = createWorldObjects(scene);
 
@@ -142,7 +145,12 @@ function selectObjectUnderPointer() {
 
   if (state.selectedObject) {
     setObjectSelected(state.selectedObject, true);
-    updateSelectionPanel(state.selectedObject.userData.worldObject);
+    const worldObject = state.selectedObject.userData.worldObject;
+
+    updateSelectionPanel(worldObject, () => {
+      if (!worldObject.collectible) return;
+      addResource(worldObject.resourceId, worldObject.collectionAmount);
+    });
   } else {
     updateSelectionPanel(null);
   }

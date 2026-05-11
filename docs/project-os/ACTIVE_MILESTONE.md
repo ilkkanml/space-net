@@ -1,33 +1,33 @@
 # ACTIVE_MILESTONE.md
 
 ## Aktif Milestone
-Milestone 02 — Grid & World Objects
+Milestone 03 — Game State & Resources
 
 ## Amaç
-Sahnede görsel grid, temel dünya objeleri ve seçilebilir nesne sistemini kurmak.
+Oyun durumunu merkezi gameState içine almak, v0.1 kaynaklarını tanımlamak, inventory/resource bar göstermek ve Iron/Copper depositlerinden manuel kaynak toplama akışını kurmak.
 
 ## Olacaklar
-- 32x32 görsel grid
-- NEXUS Core placeholder
-- Iron Deposit
-- Copper Deposit
-- Object hover feedback
-- Object selection feedback
-- Raycasting ile tıklama seçimi
-- Sağ panelde seçili obje bilgisi
-- worldObjectsData yapısı
+- js/core/gameState.js
+- js/data/resources.js
+- js/ui/resourceBar.js
+- Merkezi inventory state
+- Resource bar UI
+- Iron Ore / Copper Ore / Iron Plate / Copper Wire kaynak tanımları
+- Iron Deposit seçilince manuel +1 Iron Ore toplama
+- Copper Deposit seçilince manuel +1 Copper Ore toplama
+- Kaynak miktarı anlık UI’da güncellenir
+- Selection panel kaynak toplama aksiyonu gösterir
 
 ## Olmayacaklar
-- Kaynak toplama
-- Inventory
 - Build menu
 - Makine yerleştirme
-- Üretim
-- Conveyor mantığı
-- Storage mantığı
+- Otomatik üretim
+- Processor recipe sistemi
+- Conveyor transfer
+- Storage
 - Görev sistemi
 - E.V.A.
 - Save/load
 
 ## Kabul kriteri
-Oyun tarayıcıda açılır, grid görünür, NEXUS Core / Iron Deposit / Copper Deposit görünür, mouse ile üzerine gelince hover efekti çalışır, tıklanınca sağ panelde obje bilgisi çıkar, kamera kontrolleri bozulmaz.
+Oyun açılır, resource bar görünür, Iron Deposit’ten Iron Ore toplanır, Copper Deposit’ten Copper Ore toplanır, miktarlar anlık güncellenir, sahne/kamera/grid/selection sistemi bozulmaz.

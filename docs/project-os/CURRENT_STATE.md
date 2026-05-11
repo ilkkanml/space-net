@@ -4,7 +4,7 @@
 S.P.A.C.E. NET Studio
 
 ## Durum
-Initial Setup v1.0 tamamlandı. Milestone 01 — Scene & Camera test edildi ve geçti. v0.1.0 First Playable Prototype sıfırdan geliştiriliyor.
+Initial Setup v1.0 tamamlandı. Milestone 01 ve Milestone 02 test edildi ve geçti. v0.1.0 First Playable Prototype sıfırdan geliştiriliyor.
 
 ## Ana referans
 S.P.A.C.E. NET — Game Design Bible — Pre-Production Draft 1.0
@@ -23,10 +23,11 @@ S.P.A.C.E. NET — Game Design Bible — Pre-Production Draft 1.0
 - Sadece geliştirme sırasında gizli Debug Clear Save olabilir.
 
 ## Tamamlanan milestone
-Milestone 01 — Scene & Camera: PASSED
+- Milestone 01 — Scene & Camera: PASSED
+- Milestone 02 — Grid & World Objects: PASSED
 
 ## Aktif geliştirme hedefi
-Milestone 02 — Grid & World Objects
+Milestone 03 — Game State & Resources
 
 ## Sonraki iş
-Grid, NEXUS Core placeholder, Iron Deposit, Copper Deposit, hover/selection sistemi ve selection panel eklenecek.
+Merkezi gameState, v0.1 kaynak tanımları, inventory, resource bar ve manuel kaynak toplama sistemi eklenecek.

@@ -15,7 +15,10 @@ export const worldObjectsData = [
     type: "Resource Deposit",
     size: "2x2",
     position: { x: -12, z: -6 },
-    description: "Raw iron source. Basic Miner will connect here in a later milestone."
+    description: "Raw iron source. Select and collect Iron Ore manually in this milestone.",
+    collectible: true,
+    resourceId: "ironOre",
+    collectionAmount: 1
   },
   {
     id: "copper_deposit_01",
@@ -23,7 +26,10 @@ export const worldObjectsData = [
     type: "Resource Deposit",
     size: "2x2",
     position: { x: 12, z: 6 },
-    description: "Raw copper source. Basic Miner will connect here in a later milestone."
+    description: "Raw copper source. Select and collect Copper Ore manually in this milestone.",
+    collectible: true,
+    resourceId: "copperOre",
+    collectionAmount: 1
   }
 ];
 

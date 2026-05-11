@@ -2,20 +2,20 @@
 
 ## Sıradaki işler
 
-1. Milestone 02 update dosyalarını GitHub'a yükle.
-2. Local dosyalara aynı update'i uygula.
-3. `game` klasöründe local server başlat.
-4. Grid ve world object testlerini çalıştır.
-5. Hover / selection panel davranışını kontrol et.
+1. Milestone 03 update dosyalarını local klasöre kopyala.
+2. Aynı dosyaları GitHub'a yükle.
+3. Local server açıksa tarayıcıyı yenile.
+4. Iron Deposit ve Copper Deposit kaynak toplama testlerini yap.
+5. Test geçerse Milestone 03 PASSED olarak kilitle.
 
-## Milestone 02 testleri
+## Milestone 03 testleri
 
-- Grid görünüyor mu?
-- NEXUS Core görünüyor mu?
-- Iron Deposit görünüyor mu?
-- Copper Deposit görünüyor mu?
-- Mouse hover efekti çalışıyor mu?
-- Tıklayınca sağ panelde obje bilgisi çıkıyor mu?
-- Q/E kamera dönüşü hâlâ çalışıyor mu?
-- Mouse wheel zoom hâlâ çalışıyor mu?
-- Drag pan hâlâ çalışıyor mu?
+- Resource bar üstte görünüyor mu?
+- Başlangıçta tüm kaynaklar 0 mı?
+- Iron Deposit seçilince collect butonu çıkıyor mu?
+- Collect ile Iron Ore +1 artıyor mu?
+- Copper Deposit seçilince collect butonu çıkıyor mu?
+- Collect ile Copper Ore +1 artıyor mu?
+- NEXUS Core seçilince collect butonu gizleniyor mu?
+- Kamera kontrolleri hâlâ çalışıyor mu?
+- Console’da kritik hata yok mu?

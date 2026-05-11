@@ -8,7 +8,15 @@
 - Pan / zoom / Q-E kamera dönüşü çalıştı.
 - Local server üzerinden oyun açıldı.
 
-## v0.1.0-m02 — Grid & World Objects Started
+## v0.1.0-m02 — Grid & World Objects Passed
 
-- Aktif milestone Milestone 02 olarak güncellendi.
-- Grid ve temel world object sistemi için update paketi hazırlandı.
+- 32x32 grid göründü.
+- NEXUS Core, Iron Deposit ve Copper Deposit göründü.
+- Hover ve selection panel çalıştı.
+- Kamera kontrolleri bozulmadı.
+
+## v0.1.0-m03 — Game State & Resources Started
+
+- Aktif milestone Milestone 03 olarak güncellendi.
+- Merkezi gameState ve resource bar sistemi için update paketi hazırlandı.
+- Manuel Iron Ore / Copper Ore toplama sistemi eklendi.
