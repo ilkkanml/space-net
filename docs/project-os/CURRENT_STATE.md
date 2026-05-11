@@ -4,7 +4,7 @@
 S.P.A.C.E. NET Studio
 
 ## Durum
-Initial Setup v1.0 tamamlandı. Milestone 01, 02, 03, 04, 05, 06 ve 07 test edildi ve geçti. v0.1.0 First Playable Prototype sıfırdan geliştiriliyor.
+Initial Setup v1.0 tamamlandı. Milestone 01, 02, 03, 04, 05, 06, 07 ve 08 test edildi ve geçti. v0.1.0 First Playable Prototype sıfırdan geliştiriliyor.
 
 ## Ana referans
 S.P.A.C.E. NET — Game Design Bible — Pre-Production Draft 1.0
@@ -30,9 +30,10 @@ S.P.A.C.E. NET — Game Design Bible — Pre-Production Draft 1.0
 - Milestone 05 — Machines & Production: PASSED
 - Milestone 06 — Conveyor & Storage: PASSED
 - Milestone 07 — NEXUS Missions: QA PASSED / LOCKED
+- Milestone 08 — E.V.A. Notifications: QA PASSED / LOCKED
 
 ## Aktif geliştirme hedefi
-Milestone 08 — E.V.A. Notifications
+Milestone 09 — Save / Load & Persistence
 
 ## Sonraki iş
-E.V.A. notification state, event trigger sistemi, HUD notification paneli ve duplicate trigger engelleme eklenecek.
+Local save/load sistemi, save versioning, browser refresh persistence ve gizli developer Debug Clear Save eklenecek.

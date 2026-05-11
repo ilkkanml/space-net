@@ -1,16 +1,19 @@
 # CHANGELOG.md
 
-## v0.1.0-m07 — NEXUS Missions QA Passed / Locked
+## v0.1.0-m08 — E.V.A. Notifications QA Passed / Locked
 
-- Mission flow QA tarafından onaylandı.
-- Delivery sistemi ve Memory Fragment 01 akışı blocker olmadan geçti.
-- Milestone 08'e geçiş onaylandı.
+- E.V.A. notification sistemi QA tarafından onaylandı.
+- Duplicate notification/spam engelleme çalışıyor.
+- E.V.A. state persistence için uygun temele sahip.
 
-## v0.1.0-m08 — E.V.A. Notifications Started
+## v0.1.0-m09 — Save / Load & Persistence Started
 
-- E.V.A. notification state eklendi.
-- E.V.A. message data eklendi.
-- E.V.A. notification system eklendi.
-- Duplicate event trigger engelleme eklendi.
-- HUD E.V.A. panel eklendi.
-- Mission, production ve resource eventleri E.V.A. mesajlarına bağlandı.
+- Save/load system eklendi.
+- localStorage key `spaceNetSave_v0_1` tanımlandı.
+- saveVersion `0.1.0` tanımlandı.
+- Save Game ve Load Game UI eklendi.
+- Browser refresh sonrası otomatik save restore eklendi.
+- Building mesh restore sistemi eklendi.
+- Machine/conveyor/storage/mission/NEXUS/E.V.A. state persistence kapsamına alındı.
+- Oyuncuya açık reset eklenmedi.
+- Developer için gizli `window.spaceNetDebugClearSave()` fonksiyonu eklendi.

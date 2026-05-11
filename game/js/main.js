@@ -9,13 +9,16 @@ import { initResourceBar } from "./ui/resourceBar.js";
 import { initBuildMenu, setActiveBuildButton } from "./ui/buildMenu.js";
 import { initMissionPanel, refreshMissionPanel } from "./ui/missionPanel.js";
 import { initEVAPanel, refreshEVAPanel } from "./ui/evaPanel.js";
+import { initSaveLoadPanel, refreshSaveLoadPanel } from "./ui/saveLoadPanel.js";
 import { addResource } from "./core/gameState.js";
 import { initProductionSystem, updateProduction } from "./systems/productionSystem.js";
 import { updateConveyors } from "./systems/conveyorSystem.js";
 import { initMissionSystem, updateMissions } from "./systems/missionSystem.js";
 import { initEVANotificationSystem, updateEVANotifications } from "./systems/evaNotificationSystem.js";
+import { tryAutoLoadGame, installDeveloperDebugClearSave } from "./systems/saveLoadSystem.js";
 import {
   initBuildSystem,
+  restorePlacedBuildingsFromState,
   startPlacement,
   cancelPlacement,
   isPlacementActive,
@@ -24,6 +27,9 @@ import {
   getPlacedBuildingFromObject,
   rotatePlacementDirection
 } from "./systems/buildSystem.js";
+
+tryAutoLoadGame();
+installDeveloperDebugClearSave();
 
 const canvas = document.querySelector("#game-canvas");
 const statusText = document.querySelector("#status-text");
@@ -51,6 +57,7 @@ initProductionSystem({ onStatus: setStatus });
 initMissionSystem({ onStatus: setStatus });
 initMissionPanel();
 initEVAPanel();
+initSaveLoadPanel({ onStatus: setStatus });
 initEVANotificationSystem();
 
 const { selectableObjects } = createWorldObjects(scene);
@@ -62,6 +69,7 @@ initBuildSystem({
     updateSelectionPanel(buildingMesh);
   }
 });
+restorePlacedBuildingsFromState();
 
 initBuildMenu({
   onSelectBuild: (buildingId) => {
@@ -132,7 +140,10 @@ canvas.addEventListener("pointerup", (event) => {
 
   if (isPlacementActive()) {
     const placed = tryPlaceBuilding(getGroundPosition(), getWorldObjectUnderPointer());
-    if (placed) setActiveBuildButton(null);
+    if (placed) {
+      setActiveBuildButton(null);
+      refreshSaveLoadPanel();
+    }
     return;
   }
 
@@ -273,6 +284,7 @@ function animate() {
     refreshSelectionPanel();
     refreshMissionPanel();
     refreshEVAPanel();
+    refreshSaveLoadPanel();
   }
 
   selectableObjects.forEach((object) => {

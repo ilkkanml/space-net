@@ -284,3 +284,48 @@ body,
 .hidden {
   display: none;
 }
+
+
+.save-load-panel {
+  position: fixed;
+  z-index: 10;
+  right: 16px;
+  top: 86px;
+  width: 210px;
+  padding: 12px 14px;
+  border: 1px solid rgba(85, 220, 255, 0.22);
+  border-radius: 12px;
+  background: rgba(5, 12, 22, 0.72);
+  box-shadow: 0 0 24px rgba(0, 180, 255, 0.08);
+  backdrop-filter: blur(8px);
+  display: grid;
+  gap: 8px;
+  user-select: none;
+}
+
+.save-load-button {
+  width: 100%;
+  padding: 9px 10px;
+  border: 1px solid rgba(110, 231, 255, 0.35);
+  border-radius: 10px;
+  background: rgba(29, 167, 198, 0.22);
+  color: #e9f6ff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.save-load-button:hover:not(:disabled) {
+  background: rgba(29, 167, 198, 0.34);
+}
+
+.save-load-button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.save-load-status {
+  color: rgba(233, 246, 255, 0.62);
+  font-size: 11px;
+  line-height: 1.35;
+  text-align: center;
+}

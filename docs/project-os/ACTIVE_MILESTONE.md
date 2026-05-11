@@ -1,36 +1,36 @@
 # ACTIVE_MILESTONE.md
 
 ## Aktif Milestone
-Milestone 08 — E.V.A. Notifications
+Milestone 09 — Save / Load & Persistence
 
 ## Amaç
-E.V.A. sistemini v0.1 core loop'a bağlamak; nadir, anlamlı ve tekrarsız bildirimlerle oyuncuya yönlendirme ve atmosfer sağlamak.
+v0.1 oynanış ilerlemesini tarayıcı localStorage üzerinde kalıcı hale getirmek.
 
 ## Olacaklar
-- gameState.eva.notifications
-- gameState.eva.emittedEventIds
-- E.V.A. notification data
-- E.V.A. notification system
-- HUD E.V.A. panel
-- Duplicate trigger engelleme
-- Mission progression trigger
-- First resource trigger
-- First miner / processor / conveyor trigger
-- Input shortage trigger
-- Output blocked trigger
-- Delivery complete trigger
-- Memory Fragment 01 trigger
+- localStorage save key: `spaceNetSave_v0_1`
+- saveVersion: `0.1.0`
+- Save Game button
+- Load Game button
+- Browser refresh sonrası otomatik save restore
+- Resources persistence
+- Buildings persistence
+- Machine input/output/progress/status persistence
+- Conveyor direction/carriedItem persistence
+- Storage items/capacity persistence
+- NEXUS level/memory persistence
+- Mission active/completed/delivery progress persistence
+- E.V.A. notifications/emittedEventIds persistence
+- Gizli developer debug clear save fonksiyonu
 
 ## Olmayacaklar
-- Voiceover
-- Ses sistemi
-- Cutscene
-- Animated portrait
-- E.V.A. skinleri
-- Premium E.V.A. variantları
-- Dialogue tree
-- Chatbot sistemi
-- Backend notification persistence
+- Oyuncuya açık reset
+- Baştan başla butonu
+- Tüm ilerlemeyi sil butonu
+- Cloud save
+- Account sistemi
+- Backend
+- Save slot sistemi
+- Import/export save UI
 
 ## Kabul kriteri
-E.V.A. panel görünür. Mesajlar anlamlı olaylarda tetiklenir. Aynı event birden fazla kez spam üretmez. Mission progression ile senkron çalışır. Memory Fragment 01 mesajı tetiklenir. Mevcut kamera, build, production, conveyor, storage ve mission sistemleri bozulmaz.
+Oyuncu Save Game butonuna basınca mevcut ilerleme kaydedilir. Sayfa yenilendiğinde veya Load Game ile resources, binalar, makineler, conveyor, storage, mission, NEXUS ve E.V.A. state geri gelir. Oyuncuya açık reset bulunmaz. Sadece console üzerinden gizli developer clear save fonksiyonu vardır.

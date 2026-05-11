@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { buildingDefinitions } from "../data/buildings.js";
-import { spendCost, addBuilding } from "../core/gameState.js";
+import { gameState, spendCost, addBuilding } from "../core/gameState.js";
 import { createMachineState } from "./productionSystem.js";
 
 const CELL_SIZE = 2;
@@ -34,7 +34,29 @@ export function initBuildSystem({ scene, onStatus, onBuildingSelected }) {
   placedBuildingsGroup.name = "Placed Buildings";
   scene.add(placedBuildingsGroup);
 
-  reserveInitialWorldObjectFootprints();
+  rebuildOccupancyFromState();
+}
+
+export function restorePlacedBuildingsFromState() {
+  if (!placedBuildingsGroup) return;
+
+  placedBuildingsGroup.clear();
+  rebuildOccupancyFromState();
+
+  gameState.buildings.forEach((building) => {
+    const definition = buildingDefinitions[building.definitionId];
+    if (!definition) return;
+
+    const mesh = createBuildingMesh(definition, false);
+    mesh.position.set(building.position.x, 0.35, building.position.z);
+
+    if (building.conveyor) {
+      applyConveyorRotation(mesh, definition, building.conveyor.direction);
+    }
+
+    mesh.userData.building = building;
+    placedBuildingsGroup.add(mesh);
+  });
 }
 
 export function startPlacement(buildingId) {
@@ -44,7 +66,7 @@ export function startPlacement(buildingId) {
   const definition = buildingDefinitions[buildingId];
   previewMesh = createBuildingMesh(definition, true);
   previewMesh.name = `${definition.name} Preview`;
-  applyConveyorRotation(previewMesh, definition);
+  applyConveyorRotation(previewMesh, definition, currentConveyorDirection);
   sceneRef.add(previewMesh);
 
   statusCallback?.(`Placing ${definition.name}`);
@@ -70,7 +92,7 @@ export function rotatePlacementDirection() {
   currentConveyorDirection = directions[(index + 1) % directions.length];
 
   if (previewMesh) {
-    applyConveyorRotation(previewMesh, definition);
+    applyConveyorRotation(previewMesh, definition, currentConveyorDirection);
   }
 
   statusCallback?.(`Conveyor direction: ${currentConveyorDirection}`);
@@ -105,7 +127,7 @@ export function tryPlaceBuilding(position, depositObject) {
 
   const mesh = createBuildingMesh(definition, false);
   mesh.position.set(snapped.x, 0.35, snapped.z);
-  applyConveyorRotation(mesh, definition);
+  applyConveyorRotation(mesh, definition, currentConveyorDirection);
 
   const buildingData = {
     id: `${definition.id}_${Date.now()}`,
@@ -139,14 +161,18 @@ export function tryPlaceBuilding(position, depositObject) {
     };
   }
 
+  if (definition.allowedPlacement === "deposit" && depositObject?.userData?.worldObject) {
+    buildingData.depositId = depositObject.userData.worldObject.id;
+  }
+
   mesh.userData.building = buildingData;
   placedBuildingsGroup.add(mesh);
   addBuilding(buildingData);
 
   getCellsForBuilding(snapped, buildingData.footprintSize).forEach((cell) => occupiedCells.add(cell));
 
-  if (definition.allowedPlacement === "deposit" && depositObject?.userData?.worldObject) {
-    minedDeposits.add(depositObject.userData.worldObject.id);
+  if (buildingData.depositId) {
+    minedDeposits.add(buildingData.depositId);
   }
 
   statusCallback?.(`${definition.name} placed`);
@@ -163,6 +189,20 @@ export function getPlacedBuildingFromObject(object) {
     current = current.parent;
   }
   return null;
+}
+
+function rebuildOccupancyFromState() {
+  occupiedCells.clear();
+  minedDeposits.clear();
+  reserveInitialWorldObjectFootprints();
+
+  gameState.buildings.forEach((building) => {
+    getCellsForBuilding(building.position, building.footprintSize ?? 2).forEach((cell) => occupiedCells.add(cell));
+
+    if (building.depositId) {
+      minedDeposits.add(building.depositId);
+    }
+  });
 }
 
 function getDepositOutputResourceId(depositObject) {
@@ -344,9 +384,9 @@ function createConveyorMesh(definition, isPreview) {
   return group;
 }
 
-function applyConveyorRotation(mesh, definition) {
+function applyConveyorRotation(mesh, definition, direction) {
   if (!definition?.isConveyor) return;
-  mesh.rotation.y = directionRotations[currentConveyorDirection] ?? 0;
+  mesh.rotation.y = directionRotations[direction] ?? 0;
 }
 
 function getBuildingColor(buildingId) {
