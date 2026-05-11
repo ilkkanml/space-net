@@ -6,6 +6,14 @@ import { createMachineState } from "./productionSystem.js";
 const CELL_SIZE = 2;
 const WORLD_LIMIT = 32;
 
+const directions = ["east", "south", "west", "north"];
+const directionRotations = {
+  east: 0,
+  south: -Math.PI / 2,
+  west: Math.PI,
+  north: Math.PI / 2
+};
+
 const occupiedCells = new Set();
 const minedDeposits = new Set();
 
@@ -15,6 +23,7 @@ let previewMesh = null;
 let placedBuildingsGroup = null;
 let statusCallback = null;
 let selectBuildingCallback = null;
+let currentConveyorDirection = "east";
 
 export function initBuildSystem({ scene, onStatus, onBuildingSelected }) {
   sceneRef = scene;
@@ -35,6 +44,7 @@ export function startPlacement(buildingId) {
   const definition = buildingDefinitions[buildingId];
   previewMesh = createBuildingMesh(definition, true);
   previewMesh.name = `${definition.name} Preview`;
+  applyConveyorRotation(previewMesh, definition);
   sceneRef.add(previewMesh);
 
   statusCallback?.(`Placing ${definition.name}`);
@@ -48,6 +58,22 @@ export function cancelPlacement() {
 
 export function isPlacementActive() {
   return Boolean(selectedBuildingId);
+}
+
+export function rotatePlacementDirection() {
+  if (!selectedBuildingId) return;
+
+  const definition = buildingDefinitions[selectedBuildingId];
+  if (!definition?.isConveyor) return;
+
+  const index = directions.indexOf(currentConveyorDirection);
+  currentConveyorDirection = directions[(index + 1) % directions.length];
+
+  if (previewMesh) {
+    applyConveyorRotation(previewMesh, definition);
+  }
+
+  statusCallback?.(`Conveyor direction: ${currentConveyorDirection}`);
 }
 
 export function updatePlacementPreview(position, depositObject) {
@@ -79,6 +105,7 @@ export function tryPlaceBuilding(position, depositObject) {
 
   const mesh = createBuildingMesh(definition, false);
   mesh.position.set(snapped.x, 0.35, snapped.z);
+  applyConveyorRotation(mesh, definition);
 
   const buildingData = {
     id: `${definition.id}_${Date.now()}`,
@@ -86,6 +113,7 @@ export function tryPlaceBuilding(position, depositObject) {
     name: definition.name,
     type: definition.type,
     size: definition.size,
+    footprintSize: definition.footprintSize ?? 2,
     position: { x: snapped.x, z: snapped.z },
     description: definition.description
   };
@@ -95,11 +123,27 @@ export function tryPlaceBuilding(position, depositObject) {
     buildingData.machine = createMachineState(definition, { outputResourceId });
   }
 
+  if (definition.isStorage) {
+    buildingData.storage = {
+      capacity: definition.storageCapacity ?? 100,
+      items: {}
+    };
+  }
+
+  if (definition.isConveyor) {
+    buildingData.conveyor = {
+      direction: currentConveyorDirection,
+      transferInterval: definition.transferInterval ?? 1,
+      transferTimer: 0,
+      carriedItem: null
+    };
+  }
+
   mesh.userData.building = buildingData;
   placedBuildingsGroup.add(mesh);
   addBuilding(buildingData);
 
-  getCellsForBuilding(snapped).forEach((cell) => occupiedCells.add(cell));
+  getCellsForBuilding(snapped, buildingData.footprintSize).forEach((cell) => occupiedCells.add(cell));
 
   if (definition.allowedPlacement === "deposit" && depositObject?.userData?.worldObject) {
     minedDeposits.add(depositObject.userData.worldObject.id);
@@ -136,7 +180,7 @@ function reserveInitialWorldObjectFootprints() {
 }
 
 function reserveFootprint(position, footprintSize) {
-  getCellsForFootprint(position, footprintSize).forEach((cell) => occupiedCells.add(cell));
+  getCellsForBuilding(position, footprintSize).forEach((cell) => occupiedCells.add(cell));
 }
 
 function validatePlacement(buildingId, position, depositObject) {
@@ -167,7 +211,7 @@ function validatePlacement(buildingId, position, depositObject) {
     return { ok: true };
   }
 
-  const cells = getCellsForBuilding(position);
+  const cells = getCellsForBuilding(position, definition.footprintSize ?? 2);
   const blocked = cells.some((cell) => occupiedCells.has(cell));
 
   if (blocked) {
@@ -191,13 +235,13 @@ function worldToCell(position) {
   };
 }
 
-function getCellsForBuilding(position) {
-  return getCellsForFootprint(position, 2);
-}
-
-function getCellsForFootprint(position, footprintSize) {
+function getCellsForBuilding(position, footprintSize) {
   const center = worldToCell(position);
   const cells = [];
+
+  if (footprintSize === 1) {
+    return [`${center.x},${center.z}`];
+  }
 
   if (footprintSize === 2) {
     cells.push(
@@ -218,11 +262,14 @@ function getCellsForFootprint(position, footprintSize) {
     return cells;
   }
 
-  cells.push(`${center.x},${center.z}`);
-  return cells;
+  return [`${center.x},${center.z}`];
 }
 
 function createBuildingMesh(definition, isPreview) {
+  if (definition.isConveyor) {
+    return createConveyorMesh(definition, isPreview);
+  }
+
   const group = new THREE.Group();
 
   const material = new THREE.MeshStandardMaterial({
@@ -263,6 +310,45 @@ function createBuildingMesh(definition, isPreview) {
   return group;
 }
 
+function createConveyorMesh(definition, isPreview) {
+  const group = new THREE.Group();
+
+  const material = new THREE.MeshStandardMaterial({
+    color: 0x364a55,
+    emissive: isPreview ? 0x153f48 : 0x061f26,
+    roughness: 0.62,
+    metalness: 0.4,
+    transparent: isPreview,
+    opacity: isPreview ? 0.55 : 1
+  });
+
+  const belt = new THREE.Mesh(new THREE.BoxGeometry(1.55, 0.25, 1.55), material);
+  belt.position.y = 0.18;
+  belt.castShadow = !isPreview;
+  belt.receiveShadow = true;
+  group.add(belt);
+
+  const arrowMaterial = new THREE.MeshBasicMaterial({
+    color: 0x6ee7ff,
+    transparent: isPreview,
+    opacity: isPreview ? 0.75 : 1
+  });
+
+  const arrow = new THREE.Mesh(new THREE.ConeGeometry(0.34, 0.75, 3), arrowMaterial);
+  arrow.name = "Conveyor Direction Arrow";
+  arrow.position.set(0.35, 0.42, 0);
+  arrow.rotation.z = -Math.PI / 2;
+  group.add(arrow);
+
+  group.userData.definition = definition;
+  return group;
+}
+
+function applyConveyorRotation(mesh, definition) {
+  if (!definition?.isConveyor) return;
+  mesh.rotation.y = directionRotations[currentConveyorDirection] ?? 0;
+}
+
 function getBuildingColor(buildingId) {
   if (buildingId === "basicMiner") return 0x4b6f7b;
   if (buildingId === "basicProcessor") return 0x49658f;
@@ -272,7 +358,7 @@ function getBuildingColor(buildingId) {
 
 function setPreviewValid(mesh, isValid) {
   mesh.traverse((child) => {
-    if (!child.material) return;
+    if (!child.material || !child.material.emissive) return;
     child.material.emissive.set(isValid ? 0x145d45 : 0x5d1c1c);
   });
 }

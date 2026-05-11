@@ -96,10 +96,12 @@ body,
   display: flex;
   gap: 10px;
   align-items: stretch;
+  max-width: 78vw;
+  overflow-x: auto;
 }
 
 .build-button {
-  min-width: 150px;
+  min-width: 145px;
   padding: 9px 10px;
   border: 1px solid rgba(110, 231, 255, 0.28);
   border-radius: 10px;
@@ -138,7 +140,7 @@ body,
 .selection-panel {
   right: 16px;
   bottom: 16px;
-  width: 330px;
+  width: 340px;
   min-height: 190px;
 }
 

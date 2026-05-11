@@ -2,22 +2,21 @@
 
 ## Sıradaki işler
 
-1. Milestone 05 update dosyalarını local klasöre kopyala.
+1. Milestone 06 update dosyalarını local klasöre kopyala.
 2. Aynı dosyaları GitHub'a yükle.
 3. Local server açıksa tarayıcıyı yenile.
-4. Basic Miner ve Basic Processor production testlerini yap.
-5. Test geçerse Milestone 05 PASSED olarak kilitle.
+4. Basic Conveyor + Small Storage testlerini yap.
+5. Test geçerse Milestone 06 PASSED olarak kilitle.
 
-## Milestone 05 testleri
+## Milestone 06 testleri
 
-- Basic Miner kurulunca otomatik üretim yapıyor mu?
-- Miner output buffer dolunca outputFull oluyor mu?
-- Miner output collect edilebiliyor mu?
-- Basic Processor recipe seçilmeden noRecipe oluyor mu?
-- Iron Plate recipe seçilebiliyor mu?
-- Copper Wire recipe seçilebiliyor mu?
-- Input yokken inputShortage oluyor mu?
-- Load Input butonu global inventory'den inputBuffer'a kaynak taşıyor mu?
-- Production bitince outputBuffer'a ürün ekleniyor mu?
-- Collect Output butonu ürünü global inventory'ye taşıyor mu?
-- Kamera, grid, placement ve resource bar bozulmadan çalışıyor mu?
+- Build Menu içinde Basic Conveyor görünüyor mu?
+- Conveyor kaynak maliyeti çalışıyor mu?
+- Conveyor placement sırasında R ile yön değişiyor mu?
+- Miner output conveyor hattına geçiyor mu?
+- Conveyor zinciri item taşıyor mu?
+- Processor recipe seçiliyse conveyor input kabul ediyor mu?
+- Processor output conveyor ile Small Storage'a taşınıyor mu?
+- Small Storage item sayısı ve kapasite panelde görünüyor mu?
+- Storage collect action global inventory'ye item aktarıyor mu?
+- Kamera, build menu, resource bar ve machine status bozulmadan çalışıyor mu?

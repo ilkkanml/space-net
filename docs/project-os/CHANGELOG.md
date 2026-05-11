@@ -1,8 +1,11 @@
 # CHANGELOG.md
 
-## v0.1.0-m05-hotfix — Production Loop & UI Click Fix
+## v0.1.0-m06 — Conveyor & Storage Started
 
-- Machine selection panel refresh davranışı düzeltildi.
-- Butonların periyodik yeniden çizim yüzünden tıklama kaçırması engellendi.
-- Processor input yükleme sistemi tek batch yerine kapasiteye kadar batch yükleyecek şekilde güncellendi.
-- Processor input buffer içinde yeterli kaynak varsa üretime otomatik tekrar devam eder.
+- Basic Conveyor eklendi.
+- Conveyor direction sistemi eklendi.
+- R tuşu ile conveyor direction rotate eklendi.
+- Conveyor carried item state eklendi.
+- Conveyor transfer sistemi eklendi.
+- Small Storage capacity ve item inventory eklendi.
+- Storage panel ve collect storage items aksiyonu eklendi.

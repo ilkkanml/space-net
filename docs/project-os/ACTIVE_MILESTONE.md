@@ -1,38 +1,37 @@
 # ACTIVE_MILESTONE.md
 
 ## Aktif Milestone
-Milestone 05 — Machines & Production
+Milestone 06 — Conveyor & Storage
 
 ## Amaç
-Yerleştirilen makinelerin merkezi production loop ile çalışmasını sağlamak.
+Makine output buffer, conveyor hattı, processor input buffer ve storage arasında basit item transfer zincirini kurmak.
 
 ## Olacaklar
-- Basic Miner otomatik ham kaynak üretimi
-- Basic Processor recipe sistemi
-- Recipes:
-  - 2 Iron Ore -> 1 Iron Plate
-  - 2 Copper Ore -> 1 Copper Wire
-- Machine status:
-  - working
-  - idle
-  - inputShortage
-  - outputFull
-  - noRecipe
-- Machine input/output buffer
-- Production progress
-- Machine detail panel
-- Manual load/collect test aksiyonları
+- Basic Conveyor building
+- Conveyor direction: North / East / South / West
+- R tuşu ile placement sırasında conveyor yönü değiştirme
+- Conveyor carriedItem state
+- 1 item / transfer tick
+- Miner output -> Conveyor
+- Conveyor -> Conveyor
+- Conveyor -> Processor input
+- Processor output -> Conveyor
+- Conveyor -> Small Storage
+- Small Storage capacity: 100 total items
+- Storage item panel
+- Storage collect action
 
 ## Olmayacaklar
-- Conveyor transfer
-- Storage capacity logic
+- Conveyor pathfinding
+- Splitter / merger
+- Underground conveyor
+- Belt speed upgrade
+- Smart routing
+- Advanced logistics
 - Energy
 - Market
-- Research
 - Backend
-- Upgrade sistemi
-- Splitter/merger
-- Advanced automation
+- Save/load
 
 ## Kabul kriteri
-Basic Miner output buffer içine düzenli üretim yapar. Basic Processor seçilen recipe için input tüketir, output üretir, status doğru görünür. Output full/input shortage/no recipe durumları görülebilir. Conveyor/storage beklemeden production loop stabil çalışır.
+Basic Conveyor yerleştirilebilir. R ile yön değiştirilebilir. Miner output buffer’dan conveyor hattına item geçer. Conveyor zinciri item taşır. Processor recipe seçiliyse conveyor input kabul eder. Processor output conveyor ile storage’a taşınır. Storage 100 item kapasiteyle çalışır.

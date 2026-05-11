@@ -6,11 +6,15 @@ import {
   loadRecipeInputFromInventory,
   setRecipe
 } from "../systems/productionSystem.js";
+import { getStorageDisplay, collectStorageItems } from "../systems/storageSystem.js";
+import { getConveyorDisplay } from "../systems/conveyorSystem.js";
 
 const nameEl = document.querySelector("#selection-name");
 const typeEl = document.querySelector("#selection-type");
 const descriptionEl = document.querySelector("#selection-description");
 const machineEl = document.querySelector("#selection-machine");
+const storageEl = document.querySelector("#selection-storage");
+const conveyorEl = document.querySelector("#selection-conveyor");
 const actionsEl = document.querySelector("#selection-actions");
 
 let currentSelection = null;
@@ -21,8 +25,7 @@ export function updateSelectionPanel(selection, onCollectResource) {
   currentCollectAction = onCollectResource;
 
   actionsEl.innerHTML = "";
-  machineEl.innerHTML = "";
-  machineEl.classList.add("hidden");
+  clearInfoPanels();
 
   if (!selection) {
     nameEl.textContent = "None";
@@ -48,6 +51,15 @@ export function updateSelectionPanel(selection, onCollectResource) {
     renderMachineInfo(data);
     renderMachineActions(data);
   }
+
+  if (data.storage) {
+    renderStorageInfo(data);
+    renderStorageActions(data);
+  }
+
+  if (data.conveyor) {
+    renderConveyorInfo(data);
+  }
 }
 
 export function refreshSelectionPanel() {
@@ -55,12 +67,18 @@ export function refreshSelectionPanel() {
 
   const data = getSelectionData(currentSelection);
 
-  // Hotfix:
-  // Panelin tamamını ve butonları sürekli yeniden çizmek tıklama kaçırıyordu.
-  // Periyodik refresh artık yalnızca machine info alanını güncelliyor.
-  if (data.machine) {
-    renderMachineInfo(data);
-  }
+  if (data.machine) renderMachineInfo(data);
+  if (data.storage) renderStorageInfo(data);
+  if (data.conveyor) renderConveyorInfo(data);
+}
+
+function clearInfoPanels() {
+  machineEl.innerHTML = "";
+  storageEl.innerHTML = "";
+  conveyorEl.innerHTML = "";
+  machineEl.classList.add("hidden");
+  storageEl.classList.add("hidden");
+  conveyorEl.classList.add("hidden");
 }
 
 function getSelectionData(selection) {
@@ -100,6 +118,34 @@ function renderMachineActions(data) {
     collectMachineOutput(data);
     renderMachineInfo(data);
   });
+}
+
+function renderStorageInfo(data) {
+  const display = getStorageDisplay(data.storage);
+  storageEl.classList.remove("hidden");
+
+  storageEl.innerHTML = `
+    <div class="machine-row"><span>Capacity</span><strong>${display.capacity}</strong></div>
+    <div class="machine-row"><span>Items</span><strong>${display.items}</strong></div>
+  `;
+}
+
+function renderStorageActions(data) {
+  addAction("Collect Storage Items", () => {
+    collectStorageItems(data);
+    renderStorageInfo(data);
+  });
+}
+
+function renderConveyorInfo(data) {
+  const display = getConveyorDisplay(data.conveyor);
+  conveyorEl.classList.remove("hidden");
+
+  conveyorEl.innerHTML = `
+    <div class="machine-row"><span>Direction</span><strong>${display.direction}</strong></div>
+    <div class="machine-row"><span>Carrying</span><strong>${display.carriedItem}</strong></div>
+    <div class="machine-row"><span>Transfer</span><strong>${display.transfer}</strong></div>
+  `;
 }
 
 function addAction(label, handler, variant = "") {

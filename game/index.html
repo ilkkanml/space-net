@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>S.P.A.C.E. NET — v0.1 Milestone 05</title>
+  <title>S.P.A.C.E. NET — v0.1 Milestone 06</title>
   <link rel="stylesheet" href="./css/style.css" />
   <script type="importmap">
   {
@@ -19,7 +19,7 @@
 
     <div class="hud top-left">
       <div class="label">S.P.A.C.E. NET</div>
-      <div class="value">Milestone 05 — Machines & Production</div>
+      <div class="value">Milestone 06 — Conveyor & Storage</div>
     </div>
 
     <div class="resource-bar" id="resource-bar"></div>
@@ -28,7 +28,8 @@
       <div>Drag: Pan</div>
       <div>Mouse Wheel: Zoom</div>
       <div>Q / E: Rotate Camera</div>
-      <div>Click Machine: Status / Actions</div>
+      <div>R: Rotate Conveyor Direction</div>
+      <div>Click Machine/Storage: Status</div>
       <div>ESC: Cancel Build</div>
     </div>
 
@@ -45,6 +46,8 @@
       <div id="selection-type" class="muted">Click a world object</div>
       <div id="selection-description" class="description"></div>
       <div id="selection-machine" class="machine-info hidden"></div>
+      <div id="selection-storage" class="machine-info hidden"></div>
+      <div id="selection-conveyor" class="machine-info hidden"></div>
       <div id="selection-actions" class="actions"></div>
     </div>
   </div>

@@ -9,6 +9,7 @@ import { initResourceBar } from "./ui/resourceBar.js";
 import { initBuildMenu, setActiveBuildButton } from "./ui/buildMenu.js";
 import { addResource } from "./core/gameState.js";
 import { initProductionSystem, updateProduction } from "./systems/productionSystem.js";
+import { updateConveyors } from "./systems/conveyorSystem.js";
 import {
   initBuildSystem,
   startPlacement,
@@ -16,7 +17,8 @@ import {
   isPlacementActive,
   updatePlacementPreview,
   tryPlaceBuilding,
-  getPlacedBuildingFromObject
+  getPlacedBuildingFromObject,
+  rotatePlacementDirection
 } from "./systems/buildSystem.js";
 
 const canvas = document.querySelector("#game-canvas");
@@ -139,6 +141,7 @@ window.addEventListener("keydown", (event) => {
 
   if (key === "q") rotateCamera(camera, -1);
   if (key === "e") rotateCamera(camera, 1);
+  if (key === "r") rotatePlacementDirection();
 
   if (key === "escape") {
     cancelPlacement();
@@ -252,6 +255,7 @@ function animate() {
   const elapsed = clock.getElapsedTime();
 
   updateProduction(deltaTime);
+  updateConveyors(deltaTime);
 
   selectionRefreshTimer += deltaTime;
   if (selectionRefreshTimer >= 0.25) {
