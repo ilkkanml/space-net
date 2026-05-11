@@ -8,10 +8,12 @@ import { updateSelectionPanel, refreshSelectionPanel } from "./ui/selectionPanel
 import { initResourceBar } from "./ui/resourceBar.js";
 import { initBuildMenu, setActiveBuildButton } from "./ui/buildMenu.js";
 import { initMissionPanel, refreshMissionPanel } from "./ui/missionPanel.js";
+import { initEVAPanel, refreshEVAPanel } from "./ui/evaPanel.js";
 import { addResource } from "./core/gameState.js";
 import { initProductionSystem, updateProduction } from "./systems/productionSystem.js";
 import { updateConveyors } from "./systems/conveyorSystem.js";
 import { initMissionSystem, updateMissions } from "./systems/missionSystem.js";
+import { initEVANotificationSystem, updateEVANotifications } from "./systems/evaNotificationSystem.js";
 import {
   initBuildSystem,
   startPlacement,
@@ -48,6 +50,8 @@ initResourceBar();
 initProductionSystem({ onStatus: setStatus });
 initMissionSystem({ onStatus: setStatus });
 initMissionPanel();
+initEVAPanel();
+initEVANotificationSystem();
 
 const { selectableObjects } = createWorldObjects(scene);
 
@@ -261,12 +265,14 @@ function animate() {
   updateProduction(deltaTime);
   updateConveyors(deltaTime);
   updateMissions();
+  updateEVANotifications();
 
   selectionRefreshTimer += deltaTime;
   if (selectionRefreshTimer >= 0.25) {
     selectionRefreshTimer = 0;
     refreshSelectionPanel();
     refreshMissionPanel();
+    refreshEVAPanel();
   }
 
   selectableObjects.forEach((object) => {

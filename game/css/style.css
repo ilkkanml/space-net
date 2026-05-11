@@ -84,6 +84,44 @@ body,
   font-weight: 700;
 }
 
+.eva-panel {
+  top: 248px;
+  left: 16px;
+  width: 340px;
+  min-height: 150px;
+}
+
+.eva-name {
+  margin-top: 4px;
+  color: rgba(233, 246, 255, 0.65);
+  font-size: 12px;
+}
+
+.eva-current-message {
+  margin-top: 10px;
+  padding: 10px;
+  border-left: 3px solid rgba(110, 231, 255, 0.65);
+  border-radius: 8px;
+  background: rgba(110, 231, 255, 0.07);
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.eva-notification-log {
+  margin-top: 10px;
+  display: grid;
+  gap: 6px;
+  max-height: 130px;
+  overflow-y: auto;
+  color: rgba(233, 246, 255, 0.72);
+  font-size: 12px;
+}
+
+.eva-log-item {
+  padding-top: 6px;
+  border-top: 1px solid rgba(255,255,255,0.07);
+}
+
 .resource-bar {
   top: 16px;
   left: 50%;

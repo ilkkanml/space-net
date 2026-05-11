@@ -2,21 +2,24 @@
 
 ## Sıradaki işler
 
-1. Milestone 07 update dosyalarını local klasöre kopyala.
+1. Milestone 08 update dosyalarını local klasöre kopyala.
 2. Aynı dosyaları GitHub'a yükle.
 3. Local server açıksa tarayıcıyı yenile.
-4. Mission chain testini yap.
-5. Test geçerse Milestone 07 PASSED olarak kilitle.
+4. E.V.A. notification trigger testlerini yap.
+5. Test geçerse Milestone 08 için QA Check yaptır.
+6. QA geçerse Milestone 08'i PASSED / LOCKED yap.
 
-## Milestone 07 testleri
+## Milestone 08 testleri
 
-- Objective panel görünüyor mu?
-- NEXUS Core'a tıklayınca Wake the Core tamamlanıyor mu?
-- 20 Iron Ore + 10 Copper Ore toplandığında Gather Raw Materials tamamlanıyor mu?
-- NEXUS Core seçilip Deliver butonuna basınca partial delivery çalışıyor mu?
-- Basic Miner kurunca Build Basic Miner görevi tamamlanıyor mu?
-- 10 Iron Plate üretince Produce Iron Plate tamamlanıyor mu?
-- En az 1 conveyor kurunca Connect Conveyor tamamlanıyor mu?
-- 5 Copper Wire üretince Start Copper Production tamamlanıyor mu?
-- 25 Iron Plate + 15 Copper Wire NEXUS'a teslim edilince Memory Fragment 01 açılıyor mu?
-- Kamera, build, production, conveyor ve storage sistemleri bozulmadan çalışıyor mu?
+- E.V.A. panel görünüyor mu?
+- Game Start mesajı geliyor mu?
+- İlk kaynak toplanınca First Resource mesajı geliyor mu?
+- NEXUS stabilization sonrası NEXUS Stabilized mesajı geliyor mu?
+- İlk Basic Miner kurulunca mesaj geliyor mu?
+- İlk Basic Processor kurulunca mesaj geliyor mu?
+- İlk Basic Conveyor kurulunca mesaj geliyor mu?
+- Input shortage oluşunca mesaj bir kez geliyor mu?
+- Output full oluşunca mesaj bir kez geliyor mu?
+- NEXUS delivery tamamlanınca mesaj geliyor mu?
+- Memory Fragment 01 açılınca mesaj geliyor mu?
+- Aynı mesajlar spam yapmadan tek kez tetikleniyor mu?
