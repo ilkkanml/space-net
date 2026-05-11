@@ -13,6 +13,10 @@ export const gameState = {
     activeMissionId: firstMissionId,
     completedMissionIds: [],
     deliveryProgress: {}
+  },
+  eva: {
+    notifications: [],
+    emittedEventIds: []
   }
 };
 
