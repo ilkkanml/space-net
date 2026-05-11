@@ -1,16 +1,10 @@
 # CHANGELOG.md
 
-## v0.1.0-m09 — Save / Load & Persistence QA Passed / Locked
+## v0.1.0-m10-hotfix — Build Flow, NEXUS UI & Remove
 
-- Save Game çalıştı.
-- Load Game çalıştı.
-- Browser refresh sonrası auto-restore çalıştı.
-- Resources, buildings, machines, conveyors, storage, missions, NEXUS ve E.V.A. state restore edildi.
-- Oyuncuya açık reset sistemi bulunmadığı doğrulandı.
-- Gizli developer Debug Clear Save dışında ilerleme silme sistemi yok.
-
-## v0.1.0-m10 — v0.1 Test Pass Started
-
-- Aktif milestone v0.1 Test Pass olarak güncellendi.
-- Yeni özellik ekleme kapatıldı.
-- Full regression test checklist hazırlandı.
+- NEXUS delivery butonunun görev sonrası panelde takılı kalması düzeltildi.
+- Build mode bir yapı koyduktan sonra açık kalacak şekilde iyileştirildi.
+- Conveyor tıkla-sürükle ile uzatılabilir hale getirildi.
+- Seçili yerleştirilmiş bina/conveyor için minimal Remove Selected Building aksiyonu eklendi.
+- Delete / Backspace ile seçili bina kaldırma desteği eklendi.
+- Bu özellik oyuncuya açık reset değildir; sadece tekil hatalı yerleşimi düzeltmek içindir.

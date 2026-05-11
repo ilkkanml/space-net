@@ -22,10 +22,13 @@ import {
   startPlacement,
   cancelPlacement,
   isPlacementActive,
+  isConveyorPlacementActive,
   updatePlacementPreview,
   tryPlaceBuilding,
   getPlacedBuildingFromObject,
-  rotatePlacementDirection
+  rotatePlacementDirection,
+  removePlacedBuilding,
+  canRemoveBuilding
 } from "./systems/buildSystem.js";
 
 tryAutoLoadGame();
@@ -92,19 +95,45 @@ const state = {
   lastX: 0,
   lastY: 0,
   hoveredObject: null,
-  selectedObject: null
+  selectedObject: null,
+  isBuildDragging: false,
+  lastBuildCellKey: null
 };
 
 canvas.addEventListener("pointerdown", (event) => {
+  updatePointer(event);
+  canvas.setPointerCapture(event.pointerId);
+
+  if (isPlacementActive() && isConveyorPlacementActive()) {
+    state.isBuildDragging = true;
+    state.hasDragged = false;
+    state.lastBuildCellKey = null;
+    tryPlaceBuildingAtPointer();
+    return;
+  }
+
   state.isDragging = true;
   state.hasDragged = false;
   state.lastX = event.clientX;
   state.lastY = event.clientY;
-  canvas.setPointerCapture(event.pointerId);
 });
 
 canvas.addEventListener("pointermove", (event) => {
   updatePointer(event);
+
+  if (state.isBuildDragging) {
+    const position = getGroundPosition();
+    const depositObject = getWorldObjectUnderPointer();
+    updatePlacementPreview(position, depositObject);
+
+    const cellKey = getBuildCellKey(position);
+    if (cellKey !== state.lastBuildCellKey) {
+      state.lastBuildCellKey = cellKey;
+      tryPlaceBuildingAtPointer();
+    }
+
+    return;
+  }
 
   if (state.isDragging) {
     const deltaX = event.clientX - state.lastX;
@@ -131,6 +160,13 @@ canvas.addEventListener("pointermove", (event) => {
 });
 
 canvas.addEventListener("pointerup", (event) => {
+  if (state.isBuildDragging) {
+    state.isBuildDragging = false;
+    state.lastBuildCellKey = null;
+    canvas.releasePointerCapture(event.pointerId);
+    return;
+  }
+
   state.isDragging = false;
   canvas.releasePointerCapture(event.pointerId);
 
@@ -139,11 +175,8 @@ canvas.addEventListener("pointerup", (event) => {
   updatePointer(event);
 
   if (isPlacementActive()) {
-    const placed = tryPlaceBuilding(getGroundPosition(), getWorldObjectUnderPointer());
-    if (placed) {
-      setActiveBuildButton(null);
-      refreshSaveLoadPanel();
-    }
+    const placed = tryPlaceBuildingAtPointer();
+    if (placed) refreshSaveLoadPanel();
     return;
   }
 
@@ -161,6 +194,10 @@ window.addEventListener("keydown", (event) => {
   if (key === "q") rotateCamera(camera, -1);
   if (key === "e") rotateCamera(camera, 1);
   if (key === "r") rotatePlacementDirection();
+
+  if (key === "delete" || key === "backspace") {
+    deleteSelectedBuilding();
+  }
 
   if (key === "escape") {
     cancelPlacement();
@@ -185,6 +222,26 @@ function getGroundPosition() {
   const point = new THREE.Vector3();
   raycaster.ray.intersectPlane(groundPlane, point);
   return point;
+}
+
+function tryPlaceBuildingAtPointer() {
+  const placed = tryPlaceBuilding(getGroundPosition(), getWorldObjectUnderPointer());
+
+  if (!isPlacementActive()) {
+    setActiveBuildButton(null);
+  }
+
+  if (placed) {
+    refreshSaveLoadPanel();
+  }
+
+  return placed;
+}
+
+function getBuildCellKey(position) {
+  const x = Math.round(position.x / 2);
+  const z = Math.round(position.z / 2);
+  return `${x},${z}`;
 }
 
 function getWorldObjectUnderPointer() {
@@ -256,6 +313,18 @@ function selectObjectUnderPointer() {
   }
 
   updateSelectionPanel(null);
+}
+
+
+function deleteSelectedBuilding() {
+  const building = state.selectedObject?.userData?.building;
+  if (!building || !canRemoveBuilding(building)) return;
+
+  const removed = removePlacedBuilding(building.id);
+  if (removed) {
+    state.selectedObject = null;
+    updateSelectionPanel(null);
+  }
 }
 
 function clearWorldSelection() {

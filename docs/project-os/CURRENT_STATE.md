@@ -4,23 +4,7 @@
 S.P.A.C.E. NET Studio
 
 ## Durum
-Initial Setup v1.0 tamamlandı. Milestone 01, 02, 03, 04, 05, 06, 07, 08 ve 09 test edildi ve geçti. v0.1.0 First Playable Prototype sıfırdan geliştiriliyor.
-
-## Ana referans
-S.P.A.C.E. NET — Game Design Bible — Pre-Production Draft 1.0
-
-## Resmi kararlar
-- Web tabanlı 3D izometrik fabrika/otomasyon oyunu.
-- Ana merkez: NEXUS Core.
-- Dijital asistan: E.V.A. — Engineering Virtual Assistant.
-- Sosyal yapı: Consortium.
-- Ana hikâye: The Silence sonrası çökmüş S.P.A.C.E. NET ağını yeniden inşa etmek.
-- Pay-to-win yok.
-- Başarı satılmaz. Görünüş satılır.
-- Eski prototip kodları kullanılmayacak.
-- v0.1 temiz başlangıç olacak.
-- Oyuncuya açık reset yok.
-- Sadece geliştirme sırasında gizli Debug Clear Save olabilir.
+Milestone 01-09 QA PASSED / LOCKED. Milestone 10 — v0.1 Test Pass sırasında iki usability/bug hotfix tespit edildi ve düzeltme paketi hazırlandı.
 
 ## Tamamlanan milestone
 - Milestone 01 — Scene & Camera: PASSED
@@ -36,5 +20,5 @@ S.P.A.C.E. NET — Game Design Bible — Pre-Production Draft 1.0
 ## Aktif geliştirme hedefi
 Milestone 10 — v0.1 Test Pass
 
-## Sonraki iş
-Yeni özellik eklemeden v0.1 core loop'u uçtan uca test edilecek. Test sonucu temizse S.P.A.C.E. NET v0.1.0 First Playable Prototype internal pass olarak kilitlenecek.
+## Aktif not
+Yeni özellik eklenmiyor. Sadece v0.1 testinde çıkan bug/usability düzeltmeleri uygulanıyor.

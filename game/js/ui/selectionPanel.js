@@ -8,6 +8,7 @@ import {
 } from "../systems/productionSystem.js";
 import { getStorageDisplay, collectStorageItems } from "../systems/storageSystem.js";
 import { getConveyorDisplay } from "../systems/conveyorSystem.js";
+import { removePlacedBuilding, canRemoveBuilding } from "../systems/buildSystem.js";
 import {
   canDeliverToNexusNow,
   contactNexus,
@@ -26,6 +27,7 @@ const actionsEl = document.querySelector("#selection-actions");
 
 let currentSelection = null;
 let currentCollectAction = null;
+let lastNexusCanDeliver = null;
 
 export function updateSelectionPanel(selection, onCollectResource) {
   currentSelection = selection;
@@ -33,6 +35,7 @@ export function updateSelectionPanel(selection, onCollectResource) {
 
   actionsEl.innerHTML = "";
   clearInfoPanels();
+  lastNexusCanDeliver = null;
 
   if (!selection) {
     nameEl.textContent = "None";
@@ -73,6 +76,10 @@ export function updateSelectionPanel(selection, onCollectResource) {
   if (data.conveyor) {
     renderConveyorInfo(data);
   }
+
+  if (data.id && data.definitionId && canRemoveBuilding(data)) {
+    renderRemoveAction(data);
+  }
 }
 
 export function refreshSelectionPanel() {
@@ -80,7 +87,10 @@ export function refreshSelectionPanel() {
 
   const data = getSelectionData(currentSelection);
 
-  if (data.id === "nexus_core_01") renderNexusInfo();
+  if (data.id === "nexus_core_01") {
+    renderNexusInfo();
+    refreshNexusActionsIfNeeded();
+  }
   if (data.machine) renderMachineInfo(data);
   if (data.storage) renderStorageInfo(data);
   if (data.conveyor) renderConveyorInfo(data);
@@ -113,12 +123,24 @@ function renderNexusInfo() {
 }
 
 function renderNexusActions() {
-  if (canDeliverToNexusNow()) {
+  lastNexusCanDeliver = canDeliverToNexusNow();
+
+  if (lastNexusCanDeliver) {
     addAction("Deliver Current Mission Resources", () => {
       deliverCurrentMissionToNexus();
       renderNexusInfo();
+      actionsEl.innerHTML = "";
+      renderNexusActions();
     });
   }
+}
+
+function refreshNexusActionsIfNeeded() {
+  const canDeliverNow = canDeliverToNexusNow();
+  if (canDeliverNow === lastNexusCanDeliver) return;
+
+  actionsEl.innerHTML = "";
+  renderNexusActions();
 }
 
 function renderMachineInfo(data) {
@@ -182,6 +204,16 @@ function renderConveyorInfo(data) {
     <div class="machine-row"><span>Carrying</span><strong>${display.carriedItem}</strong></div>
     <div class="machine-row"><span>Transfer</span><strong>${display.transfer}</strong></div>
   `;
+}
+
+
+function renderRemoveAction(data) {
+  addAction("Remove Selected Building", () => {
+    const ok = removePlacedBuilding(data.id);
+    if (ok) {
+      updateSelectionPanel(null);
+    }
+  }, "danger");
 }
 
 function addAction(label, handler, variant = "") {

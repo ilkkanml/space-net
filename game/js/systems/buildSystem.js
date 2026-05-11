@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { buildingDefinitions } from "../data/buildings.js";
-import { gameState, spendCost, addBuilding } from "../core/gameState.js";
+import { gameState, spendCost, canAfford, addBuilding } from "../core/gameState.js";
 import { createMachineState } from "./productionSystem.js";
 
 const CELL_SIZE = 2;
@@ -82,6 +82,11 @@ export function isPlacementActive() {
   return Boolean(selectedBuildingId);
 }
 
+export function isConveyorPlacementActive() {
+  if (!selectedBuildingId) return false;
+  return Boolean(buildingDefinitions[selectedBuildingId]?.isConveyor);
+}
+
 export function rotatePlacementDirection() {
   if (!selectedBuildingId) return;
 
@@ -137,7 +142,8 @@ export function tryPlaceBuilding(position, depositObject) {
     size: definition.size,
     footprintSize: definition.footprintSize ?? 2,
     position: { x: snapped.x, z: snapped.z },
-    description: definition.description
+    description: definition.description,
+    depositId: depositObject?.userData?.worldObject?.id ?? null
   };
 
   if (definition.isMachine) {
@@ -175,10 +181,15 @@ export function tryPlaceBuilding(position, depositObject) {
     minedDeposits.add(buildingData.depositId);
   }
 
-  statusCallback?.(`${definition.name} placed`);
   selectBuildingCallback?.(mesh);
 
-  cancelPlacement();
+  if (canAfford(definition.cost)) {
+    statusCallback?.(`${definition.name} placed. Continue placing or press ESC.`);
+  } else {
+    statusCallback?.(`${definition.name} placed. Not enough resources to continue.`);
+    cancelPlacement();
+  }
+
   return true;
 }
 
@@ -304,6 +315,48 @@ function getCellsForBuilding(position, footprintSize) {
 
   return [`${center.x},${center.z}`];
 }
+
+
+export function removePlacedBuilding(buildingId) {
+  const index = gameState.buildings.findIndex((building) => building.id === buildingId);
+  if (index === -1) return false;
+
+  const [building] = gameState.buildings.splice(index, 1);
+
+  getCellsForBuilding(building.position, building.footprintSize ?? 2).forEach((cell) => {
+    occupiedCells.delete(cell);
+  });
+
+  if (building.definitionId === "basicMiner" && building.depositId) {
+    minedDeposits.delete(building.depositId);
+  }
+
+  const mesh = findPlacedBuildingMesh(buildingId);
+  if (mesh) {
+    placedBuildingsGroup.remove(mesh);
+  }
+
+  notifyStateChanged();
+  statusCallback?.(`${building.name} removed`);
+  return true;
+}
+
+export function canRemoveBuilding(building) {
+  return Boolean(building && building.id && building.definitionId !== "nexus_core_01");
+}
+
+function findPlacedBuildingMesh(buildingId) {
+  let found = null;
+
+  placedBuildingsGroup.traverse((object) => {
+    if (object.userData?.building?.id === buildingId) {
+      found = object;
+    }
+  });
+
+  return found;
+}
+
 
 function createBuildingMesh(definition, isPreview) {
   if (definition.isConveyor) {

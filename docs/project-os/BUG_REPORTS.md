@@ -1,13 +1,10 @@
 # BUG_REPORTS.md
 
-## Açık hatalar
+## Milestone 10 Hotfix
 
 | ID | Öncelik | Sistem | Açıklama | Durum |
 |---|---|---|---|---|
-
-## Kapanan hatalar
-
-| ID | Sistem | Çözüm | Sürüm |
-|---|---|---|---|
-| BUG-M05-001 | UI | Machine panel her 0.25 saniyede komple yeniden çizildiği için bazı buton tıklamaları kaçıyordu. Refresh sadece machine info alanını güncelleyecek şekilde düzeltildi. | v0.1.0-m05-hotfix |
-| BUG-M05-002 | Production | Processor input yükleme sadece tek batch taşıdığı için üretim bitince inventory'de malzeme olsa bile duruyordu. Load Input artık input buffer kapasitesi dolana kadar mümkün olan batch'leri yükler. | v0.1.0-m05-hotfix |
+| BUG-M10-001 | High | NEXUS UI | NEXUS delivery görevi tamamlandıktan sonra Deliver Current Mission Resources butonu boş alana tıklanana kadar panelde kalıyordu. | Fixed |
+| BUG-M10-002 | Medium | Building Placement | Bir yapı koyulduktan sonra build mode kapanıyor, ardışık yerleştirme akışını yavaşlatıyordu. | Fixed |
+| BUG-M10-003 | Medium | Conveyor Placement | Conveyor hattı tıkla-sürükle mantığıyla hızlı uzatılamıyordu. | Fixed |
+| BUG-M10-004 | Medium | Building Removal | Yanlış yerleştirilen bina/conveyor kaldırılamadığı için v0.1 test akışı gereksiz kilitlenebiliyordu. Minimal Remove Selected Building aksiyonu eklendi. | Fixed |
