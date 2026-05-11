@@ -8,7 +8,6 @@ import {
 } from "../systems/productionSystem.js";
 import { getStorageDisplay, collectStorageItems } from "../systems/storageSystem.js";
 import { getConveyorDisplay } from "../systems/conveyorSystem.js";
-import { removePlacedBuilding, canRemoveBuilding } from "../systems/buildSystem.js";
 import {
   canDeliverToNexusNow,
   contactNexus,
@@ -77,9 +76,6 @@ export function updateSelectionPanel(selection, onCollectResource) {
     renderConveyorInfo(data);
   }
 
-  if (data.id && data.definitionId && canRemoveBuilding(data)) {
-    renderRemoveAction(data);
-  }
 }
 
 export function refreshSelectionPanel() {
@@ -206,15 +202,6 @@ function renderConveyorInfo(data) {
   `;
 }
 
-
-function renderRemoveAction(data) {
-  addAction("Remove Selected Building", () => {
-    const ok = removePlacedBuilding(data.id);
-    if (ok) {
-      updateSelectionPanel(null);
-    }
-  }, "danger");
-}
 
 function addAction(label, handler, variant = "") {
   const button = document.createElement("button");

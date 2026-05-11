@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { buildingDefinitions } from "../data/buildings.js";
-import { gameState, spendCost, canAfford, addBuilding } from "../core/gameState.js";
+import { gameState, spendCost, canAfford, addBuilding, notifyStateChanged } from "../core/gameState.js";
 import { createMachineState } from "./productionSystem.js";
 
 const CELL_SIZE = 2;
@@ -318,31 +318,77 @@ function getCellsForBuilding(position, footprintSize) {
 
 
 export function removePlacedBuilding(buildingId) {
-  const index = gameState.buildings.findIndex((building) => building.id === buildingId);
-  if (index === -1) return false;
+  return removePlacedBuildings([buildingId]) > 0;
+}
 
-  const [building] = gameState.buildings.splice(index, 1);
+export function removePlacedBuildings(buildingIds) {
+  const ids = new Set(buildingIds);
+  let removedCount = 0;
 
-  getCellsForBuilding(building.position, building.footprintSize ?? 2).forEach((cell) => {
-    occupiedCells.delete(cell);
+  [...ids].forEach((buildingId) => {
+    const index = gameState.buildings.findIndex((building) => building.id === buildingId);
+    if (index === -1) return;
+
+    const [building] = gameState.buildings.splice(index, 1);
+
+    getCellsForBuilding(building.position, building.footprintSize ?? 2).forEach((cell) => {
+      occupiedCells.delete(cell);
+    });
+
+    if (building.definitionId === "basicMiner" && building.depositId) {
+      minedDeposits.delete(building.depositId);
+    }
+
+    const mesh = findPlacedBuildingMesh(buildingId);
+    if (mesh) {
+      placedBuildingsGroup.remove(mesh);
+    }
+
+    removedCount += 1;
   });
 
-  if (building.definitionId === "basicMiner" && building.depositId) {
-    minedDeposits.delete(building.depositId);
+  if (removedCount > 0) {
+    notifyStateChanged();
+    statusCallback?.(`${removedCount} building${removedCount > 1 ? "s" : ""} removed`);
   }
 
-  const mesh = findPlacedBuildingMesh(buildingId);
-  if (mesh) {
-    placedBuildingsGroup.remove(mesh);
-  }
-
-  notifyStateChanged();
-  statusCallback?.(`${building.name} removed`);
-  return true;
+  return removedCount;
 }
 
 export function canRemoveBuilding(building) {
   return Boolean(building && building.id && building.definitionId !== "nexus_core_01");
+}
+
+export function setRemoveHighlights(buildingIds) {
+  const ids = new Set(buildingIds);
+
+  placedBuildingsGroup.traverse((object) => {
+    if (!object.material || !object.material.emissive) return;
+
+    if (!object.userData.removeBaseEmissive) {
+      object.userData.removeBaseEmissive = object.material.emissive.clone();
+    }
+
+    const building = getParentBuildingData(object);
+    if (building && ids.has(building.id)) {
+      object.material.emissive.set(0x8b1f1f);
+    } else {
+      object.material.emissive.copy(object.userData.removeBaseEmissive);
+    }
+  });
+}
+
+export function clearRemoveHighlights() {
+  setRemoveHighlights([]);
+}
+
+function getParentBuildingData(object) {
+  let current = object;
+  while (current) {
+    if (current.userData?.building) return current.userData.building;
+    current = current.parent;
+  }
+  return null;
 }
 
 function findPlacedBuildingMesh(buildingId) {
@@ -356,7 +402,6 @@ function findPlacedBuildingMesh(buildingId) {
 
   return found;
 }
-
 
 function createBuildingMesh(definition, isPreview) {
   if (definition.isConveyor) {

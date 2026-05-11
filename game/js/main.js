@@ -28,7 +28,10 @@ import {
   getPlacedBuildingFromObject,
   rotatePlacementDirection,
   removePlacedBuilding,
-  canRemoveBuilding
+  removePlacedBuildings,
+  canRemoveBuilding,
+  setRemoveHighlights,
+  clearRemoveHighlights
 } from "./systems/buildSystem.js";
 
 tryAutoLoadGame();
@@ -76,24 +79,22 @@ restorePlacedBuildingsFromState();
 
 initBuildMenu({
   onSelectBuild: (buildingId) => {
-    state.isRemoveMode = false;
+    exitRemoveMode(false);
     clearWorldSelection();
     updateSelectionPanel(null);
     startPlacement(buildingId);
   },
   onCancelBuild: () => {
-    state.isRemoveMode = false;
+    exitRemoveMode(false);
     cancelPlacement();
     setActiveBuildButton(null);
     setRemoveModeActive(false);
   },
   onRemoveMode: () => {
-    cancelPlacement();
-    setActiveBuildButton(null);
-    state.isRemoveMode = true;
-    clearWorldSelection();
-    updateSelectionPanel(null);
-    setStatus("Remove mode: click a placed building");
+    enterRemoveMode();
+  },
+  onDeleteSelected: () => {
+    deleteRemoveSelection();
   }
 });
 
@@ -109,7 +110,10 @@ const state = {
   selectedObject: null,
   isBuildDragging: false,
   lastBuildCellKey: null,
-  isRemoveMode: false
+  isRemoveMode: false,
+  isRemoveDragging: false,
+  lastRemoveCellKey: null,
+  removeSelectionIds: new Set()
 };
 
 canvas.addEventListener("pointerdown", (event) => {
@@ -117,7 +121,10 @@ canvas.addEventListener("pointerdown", (event) => {
   canvas.setPointerCapture(event.pointerId);
 
   if (state.isRemoveMode) {
+    state.isRemoveDragging = true;
     state.hasDragged = false;
+    state.lastRemoveCellKey = getBuildCellKey(getGroundPosition());
+    selectRemoveTargetUnderPointer({ toggle: true });
     return;
   }
 
@@ -137,6 +144,16 @@ canvas.addEventListener("pointerdown", (event) => {
 
 canvas.addEventListener("pointermove", (event) => {
   updatePointer(event);
+
+  if (state.isRemoveMode && state.isRemoveDragging) {
+    const position = getGroundPosition();
+    const cellKey = getBuildCellKey(position);
+    if (cellKey !== state.lastRemoveCellKey) {
+      state.lastRemoveCellKey = cellKey;
+      selectRemoveTargetUnderPointer({ toggle: true });
+    }
+    return;
+  }
 
   if (state.isBuildDragging) {
     const position = getGroundPosition();
@@ -177,6 +194,13 @@ canvas.addEventListener("pointermove", (event) => {
 });
 
 canvas.addEventListener("pointerup", (event) => {
+  if (state.isRemoveMode && state.isRemoveDragging) {
+    state.isRemoveDragging = false;
+    state.lastRemoveCellKey = null;
+    canvas.releasePointerCapture(event.pointerId);
+    return;
+  }
+
   if (state.isBuildDragging) {
     state.isBuildDragging = false;
     state.lastBuildCellKey = null;
@@ -213,11 +237,15 @@ window.addEventListener("keydown", (event) => {
   if (key === "r") rotatePlacementDirection();
 
   if (key === "delete" || key === "backspace") {
-    deleteSelectedBuilding();
+    if (state.isRemoveMode) {
+      deleteRemoveSelection();
+    } else {
+      deleteSelectedBuilding();
+    }
   }
 
   if (key === "escape") {
-    state.isRemoveMode = false;
+    exitRemoveMode(true);
     cancelPlacement();
     setActiveBuildButton(null);
     setRemoveModeActive(false);
@@ -335,20 +363,82 @@ function selectObjectUnderPointer() {
 }
 
 
-function removeBuildingUnderPointer() {
-  const object = getSelectableUnderPointer();
+function enterRemoveMode() {
+  cancelPlacement();
+  setActiveBuildButton(null);
+  setRemoveModeActive(true);
+  state.isRemoveMode = true;
+  state.isRemoveDragging = false;
+  state.removeSelectionIds.clear();
+  clearRemoveHighlights();
+  clearWorldSelection();
+  updateSelectionPanel(null);
+  setStatus("Remove mode: click buildings or drag over conveyors, then Delete Selected");
+}
+
+function exitRemoveMode(clearPanel = true) {
+  state.isRemoveMode = false;
+  state.isRemoveDragging = false;
+  state.lastRemoveCellKey = null;
+  state.removeSelectionIds.clear();
+  clearRemoveHighlights();
+  if (clearPanel) updateSelectionPanel(null);
+}
+
+function getPlacedBuildingUnderPointer() {
+  raycaster.setFromCamera(pointer, camera);
+  const hits = raycaster.intersectObjects(scene.children, true);
+
+  for (const hit of hits) {
+    const building = getPlacedBuildingFromObject(hit.object);
+    if (building) return building;
+  }
+
+  return null;
+}
+
+function selectRemoveTargetUnderPointer({ toggle = false } = {}) {
+  const object = getPlacedBuildingUnderPointer();
   const building = object?.userData?.building;
 
   if (!building || !canRemoveBuilding(building)) {
-    setStatus("Remove mode: no removable building selected");
+    return false;
+  }
+
+  if (toggle && state.removeSelectionIds.has(building.id)) {
+    state.removeSelectionIds.delete(building.id);
+
+    if (state.selectedObject?.userData?.building?.id === building.id) {
+      state.selectedObject = null;
+      updateSelectionPanel(null);
+    }
+
+    setRemoveHighlights([...state.removeSelectionIds]);
+    setStatus(`${state.removeSelectionIds.size} selected for removal. Click Delete Selected.`);
+    return true;
+  }
+
+  state.removeSelectionIds.add(building.id);
+  state.selectedObject = object;
+  updateSelectionPanel(object);
+  setRemoveHighlights([...state.removeSelectionIds]);
+  setStatus(`${state.removeSelectionIds.size} selected for removal. Click Delete Selected.`);
+  return true;
+}
+
+function deleteRemoveSelection() {
+  if (state.removeSelectionIds.size === 0) {
+    setStatus("Remove mode: no selected building to delete");
     return;
   }
 
-  const removed = removePlacedBuilding(building.id);
-  if (removed) {
-    state.selectedObject = null;
-    updateSelectionPanel(null);
-  }
+  const removedCount = removePlacedBuildings([...state.removeSelectionIds]);
+  state.removeSelectionIds.clear();
+  clearRemoveHighlights();
+  state.selectedObject = null;
+  updateSelectionPanel(null);
+  refreshSaveLoadPanel();
+  setStatus(`${removedCount} selected building${removedCount > 1 ? "s" : ""} deleted`);
 }
 
 function deleteSelectedBuilding() {

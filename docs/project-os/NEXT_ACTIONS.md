@@ -1,12 +1,11 @@
 # NEXT_ACTIONS.md
 
-## Remove Mode Testleri
+## Remove Drag Toggle Test
 
-1. Build menu içinde Remove butonu görünüyor mu kontrol et.
-2. Remove butonuna bas.
-3. Yerleştirilmiş conveyor veya binaya tıkla.
-4. Obje sahneden kalkıyor mu kontrol et.
-5. Kaldırılan alan tekrar build edilebilir oluyor mu kontrol et.
-6. ESC veya Cancel ile remove modundan çıkılıyor mu kontrol et.
-7. Delete / Backspace ile seçili yapıyı kaldırma hâlâ çalışıyor mu kontrol et.
-8. Save / Load sonrası kaldırılan yapı geri gelmiyor mu kontrol et.
+1. Remove moduna gir.
+2. Conveyor hattı üzerinde tıkla-sürükle yap; conveyorlar kırmızı seçilsin.
+3. Aynı conveyor hattı üzerinde tekrar tıkla-sürükle yap; seçim iptal olsun.
+4. Tek binaya tıkla; kırmızı seçilsin.
+5. Aynı binaya tekrar tıkla; seçim iptal olsun.
+6. Delete Selected yalnızca seçili kırmızı objeleri silsin.
+7. ESC / Cancel remove modunu kapatsın ve seçimi temizlesin.

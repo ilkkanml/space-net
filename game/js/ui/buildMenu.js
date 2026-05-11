@@ -9,11 +9,13 @@ let removeModeActive = false;
 let selectHandler = null;
 let cancelHandler = null;
 let removeModeHandler = null;
+let deleteSelectedHandler = null;
 
-export function initBuildMenu({ onSelectBuild, onCancelBuild, onRemoveMode }) {
+export function initBuildMenu({ onSelectBuild, onCancelBuild, onRemoveMode, onDeleteSelected }) {
   selectHandler = onSelectBuild;
   cancelHandler = onCancelBuild;
   removeModeHandler = onRemoveMode;
+  deleteSelectedHandler = onDeleteSelected;
   renderBuildMenu();
   subscribeToState(renderBuildMenu);
 }
@@ -67,7 +69,7 @@ function renderBuildMenu() {
   remove.className = "build-button remove-build";
   if (removeModeActive) remove.classList.add("active", "danger");
   remove.type = "button";
-  remove.innerHTML = `<div class="build-title">Remove</div><div class="build-cost">Click building</div>`;
+  remove.innerHTML = `<div class="build-title">Remove</div><div class="build-cost">Select mode</div>`;
   remove.addEventListener("click", () => {
     selectedBuildingId = null;
     removeModeActive = true;
@@ -75,6 +77,17 @@ function renderBuildMenu() {
     removeModeHandler?.();
   });
   buildMenuEl.append(remove);
+
+  if (removeModeActive) {
+    const deleteSelected = document.createElement("button");
+    deleteSelected.className = "build-button delete-selected danger";
+    deleteSelected.type = "button";
+    deleteSelected.innerHTML = `<div class="build-title">Delete Selected</div><div class="build-cost">Remove marked</div>`;
+    deleteSelected.addEventListener("click", () => {
+      deleteSelectedHandler?.();
+    });
+    buildMenuEl.append(deleteSelected);
+  }
 
   const cancel = document.createElement("button");
   cancel.className = "build-button cancel-build";

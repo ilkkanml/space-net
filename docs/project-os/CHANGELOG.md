@@ -1,9 +1,8 @@
 # CHANGELOG.md
 
-## v0.1.0-m10-hotfix — Remove Mode Fix
+## v0.1.0-m10-hotfix — Remove Drag Toggle
 
-- Build menu içine görünür Remove modu eklendi.
-- Remove butonu aktifken haritadaki yerleştirilmiş bina/conveyor tıklanarak kaldırılabilir.
-- Delete / Backspace ile seçili yapı kaldırma desteği korunur.
-- ESC / Cancel remove modundan çıkar.
-- Bu özellik Reset değildir; yalnızca tekil hatalı yerleşimi kaldırır.
+- Remove modunda tıklama seçim/seçim iptali yapar.
+- Remove modunda tıkla-sürükle her hücreyi bir kez toggle eder.
+- Seçili conveyor hattının üzerinden tekrar sürüklenirse seçim iptal olur.
+- Build/Remove UX standardı v0.1 için kilitlendi.
