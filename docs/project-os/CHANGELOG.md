@@ -1,10 +1,9 @@
 # CHANGELOG.md
 
-## v0.1.0-m10-hotfix — Build Flow, NEXUS UI & Remove
+## v0.1.0-m10-hotfix — Remove Mode Fix
 
-- NEXUS delivery butonunun görev sonrası panelde takılı kalması düzeltildi.
-- Build mode bir yapı koyduktan sonra açık kalacak şekilde iyileştirildi.
-- Conveyor tıkla-sürükle ile uzatılabilir hale getirildi.
-- Seçili yerleştirilmiş bina/conveyor için minimal Remove Selected Building aksiyonu eklendi.
-- Delete / Backspace ile seçili bina kaldırma desteği eklendi.
-- Bu özellik oyuncuya açık reset değildir; sadece tekil hatalı yerleşimi düzeltmek içindir.
+- Build menu içine görünür Remove modu eklendi.
+- Remove butonu aktifken haritadaki yerleştirilmiş bina/conveyor tıklanarak kaldırılabilir.
+- Delete / Backspace ile seçili yapı kaldırma desteği korunur.
+- ESC / Cancel remove modundan çıkar.
+- Bu özellik Reset değildir; yalnızca tekil hatalı yerleşimi kaldırır.

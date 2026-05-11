@@ -6,7 +6,7 @@ import { createGrid } from "./world/grid.js";
 import { createWorldObjects, setObjectHover, setObjectSelected } from "./world/worldObjects.js";
 import { updateSelectionPanel, refreshSelectionPanel } from "./ui/selectionPanel.js";
 import { initResourceBar } from "./ui/resourceBar.js";
-import { initBuildMenu, setActiveBuildButton } from "./ui/buildMenu.js";
+import { initBuildMenu, setActiveBuildButton, setRemoveModeActive } from "./ui/buildMenu.js";
 import { initMissionPanel, refreshMissionPanel } from "./ui/missionPanel.js";
 import { initEVAPanel, refreshEVAPanel } from "./ui/evaPanel.js";
 import { initSaveLoadPanel, refreshSaveLoadPanel } from "./ui/saveLoadPanel.js";
@@ -76,13 +76,24 @@ restorePlacedBuildingsFromState();
 
 initBuildMenu({
   onSelectBuild: (buildingId) => {
+    state.isRemoveMode = false;
     clearWorldSelection();
     updateSelectionPanel(null);
     startPlacement(buildingId);
   },
   onCancelBuild: () => {
+    state.isRemoveMode = false;
     cancelPlacement();
     setActiveBuildButton(null);
+    setRemoveModeActive(false);
+  },
+  onRemoveMode: () => {
+    cancelPlacement();
+    setActiveBuildButton(null);
+    state.isRemoveMode = true;
+    clearWorldSelection();
+    updateSelectionPanel(null);
+    setStatus("Remove mode: click a placed building");
   }
 });
 
@@ -97,12 +108,18 @@ const state = {
   hoveredObject: null,
   selectedObject: null,
   isBuildDragging: false,
-  lastBuildCellKey: null
+  lastBuildCellKey: null,
+  isRemoveMode: false
 };
 
 canvas.addEventListener("pointerdown", (event) => {
   updatePointer(event);
   canvas.setPointerCapture(event.pointerId);
+
+  if (state.isRemoveMode) {
+    state.hasDragged = false;
+    return;
+  }
 
   if (isPlacementActive() && isConveyorPlacementActive()) {
     state.isBuildDragging = true;
@@ -200,8 +217,10 @@ window.addEventListener("keydown", (event) => {
   }
 
   if (key === "escape") {
+    state.isRemoveMode = false;
     cancelPlacement();
     setActiveBuildButton(null);
+    setRemoveModeActive(false);
   }
 });
 
@@ -315,6 +334,22 @@ function selectObjectUnderPointer() {
   updateSelectionPanel(null);
 }
 
+
+function removeBuildingUnderPointer() {
+  const object = getSelectableUnderPointer();
+  const building = object?.userData?.building;
+
+  if (!building || !canRemoveBuilding(building)) {
+    setStatus("Remove mode: no removable building selected");
+    return;
+  }
+
+  const removed = removePlacedBuilding(building.id);
+  if (removed) {
+    state.selectedObject = null;
+    updateSelectionPanel(null);
+  }
+}
 
 function deleteSelectedBuilding() {
   const building = state.selectedObject?.userData?.building;

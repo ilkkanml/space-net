@@ -1,13 +1,12 @@
 # NEXT_ACTIONS.md
 
-## Milestone 10 Hotfix Testleri
+## Remove Mode Testleri
 
-1. NEXUS delivery görevi tamamlandıktan sonra buton panelde takılı kalıyor mu kontrol et.
-2. Basic Conveyor seç ve ard arda yerleştirmenin açık kaldığını kontrol et.
-3. Conveyor seçiliyken tıkla-sürükle ile hat uzuyor mu kontrol et.
-4. Seçili conveyor/building panelinde Remove Selected Building görünüyor mu kontrol et.
-5. Remove Selected Building ile obje kalkıyor mu kontrol et.
-6. Delete / Backspace ile seçili obje kalkıyor mu kontrol et.
-7. Kaldırılan alan tekrar build edilebilir oluyor mu kontrol et.
-8. Save / Load sonrası mevcut objeler doğru geliyor mu kontrol et.
-9. Oyuncuya açık Reset / Baştan Başla / tüm ilerlemeyi sil butonu olmadığını tekrar kontrol et.
+1. Build menu içinde Remove butonu görünüyor mu kontrol et.
+2. Remove butonuna bas.
+3. Yerleştirilmiş conveyor veya binaya tıkla.
+4. Obje sahneden kalkıyor mu kontrol et.
+5. Kaldırılan alan tekrar build edilebilir oluyor mu kontrol et.
+6. ESC veya Cancel ile remove modundan çıkılıyor mu kontrol et.
+7. Delete / Backspace ile seçili yapıyı kaldırma hâlâ çalışıyor mu kontrol et.
+8. Save / Load sonrası kaldırılan yapı geri gelmiyor mu kontrol et.

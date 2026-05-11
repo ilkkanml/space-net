@@ -5,18 +5,28 @@ import { canAfford, subscribeToState } from "../core/gameState.js";
 const buildMenuEl = document.querySelector("#build-menu");
 
 let selectedBuildingId = null;
+let removeModeActive = false;
 let selectHandler = null;
 let cancelHandler = null;
+let removeModeHandler = null;
 
-export function initBuildMenu({ onSelectBuild, onCancelBuild }) {
+export function initBuildMenu({ onSelectBuild, onCancelBuild, onRemoveMode }) {
   selectHandler = onSelectBuild;
   cancelHandler = onCancelBuild;
+  removeModeHandler = onRemoveMode;
   renderBuildMenu();
   subscribeToState(renderBuildMenu);
 }
 
 export function setActiveBuildButton(buildingId) {
   selectedBuildingId = buildingId;
+  removeModeActive = false;
+  renderBuildMenu();
+}
+
+export function setRemoveModeActive(isActive) {
+  removeModeActive = isActive;
+  if (isActive) selectedBuildingId = null;
   renderBuildMenu();
 }
 
@@ -45,6 +55,7 @@ function renderBuildMenu() {
     button.addEventListener("click", () => {
       if (button.disabled) return;
       selectedBuildingId = buildingId;
+      removeModeActive = false;
       renderBuildMenu();
       selectHandler?.(buildingId);
     });
@@ -52,12 +63,26 @@ function renderBuildMenu() {
     buildMenuEl.append(button);
   });
 
+  const remove = document.createElement("button");
+  remove.className = "build-button remove-build";
+  if (removeModeActive) remove.classList.add("active", "danger");
+  remove.type = "button";
+  remove.innerHTML = `<div class="build-title">Remove</div><div class="build-cost">Click building</div>`;
+  remove.addEventListener("click", () => {
+    selectedBuildingId = null;
+    removeModeActive = true;
+    renderBuildMenu();
+    removeModeHandler?.();
+  });
+  buildMenuEl.append(remove);
+
   const cancel = document.createElement("button");
   cancel.className = "build-button cancel-build";
   cancel.type = "button";
   cancel.textContent = "Cancel";
   cancel.addEventListener("click", () => {
     selectedBuildingId = null;
+    removeModeActive = false;
     renderBuildMenu();
     cancelHandler?.();
   });
