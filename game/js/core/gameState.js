@@ -1,9 +1,19 @@
 import { resourceOrder } from "../data/resources.js";
+import { firstMissionId } from "../data/missions.js";
 
 export const gameState = {
   version: "0.1.0",
   resources: Object.fromEntries(resourceOrder.map((resourceId) => [resourceId, 0])),
-  buildings: []
+  buildings: [],
+  nexus: {
+    level: 1,
+    memoryFragments: []
+  },
+  missions: {
+    activeMissionId: firstMissionId,
+    completedMissionIds: [],
+    deliveryProgress: {}
+  }
 };
 
 const listeners = new Set();

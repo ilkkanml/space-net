@@ -8,10 +8,17 @@ import {
 } from "../systems/productionSystem.js";
 import { getStorageDisplay, collectStorageItems } from "../systems/storageSystem.js";
 import { getConveyorDisplay } from "../systems/conveyorSystem.js";
+import {
+  canDeliverToNexusNow,
+  contactNexus,
+  deliverCurrentMissionToNexus,
+  getNexusDisplay
+} from "../systems/missionSystem.js";
 
 const nameEl = document.querySelector("#selection-name");
 const typeEl = document.querySelector("#selection-type");
 const descriptionEl = document.querySelector("#selection-description");
+const nexusEl = document.querySelector("#selection-nexus");
 const machineEl = document.querySelector("#selection-machine");
 const storageEl = document.querySelector("#selection-storage");
 const conveyorEl = document.querySelector("#selection-conveyor");
@@ -40,6 +47,12 @@ export function updateSelectionPanel(selection, onCollectResource) {
   typeEl.textContent = `${data.type} • ${data.size ?? "Object"}`;
   descriptionEl.textContent = data.description ?? "";
 
+  if (data.id === "nexus_core_01") {
+    contactNexus();
+    renderNexusInfo();
+    renderNexusActions();
+  }
+
   if (data.collectible && data.resourceId) {
     const resource = resources[data.resourceId];
     addAction(`Collect +${data.collectionAmount} ${resource.name}`, () => {
@@ -67,15 +80,18 @@ export function refreshSelectionPanel() {
 
   const data = getSelectionData(currentSelection);
 
+  if (data.id === "nexus_core_01") renderNexusInfo();
   if (data.machine) renderMachineInfo(data);
   if (data.storage) renderStorageInfo(data);
   if (data.conveyor) renderConveyorInfo(data);
 }
 
 function clearInfoPanels() {
+  nexusEl.innerHTML = "";
   machineEl.innerHTML = "";
   storageEl.innerHTML = "";
   conveyorEl.innerHTML = "";
+  nexusEl.classList.add("hidden");
   machineEl.classList.add("hidden");
   storageEl.classList.add("hidden");
   conveyorEl.classList.add("hidden");
@@ -83,6 +99,26 @@ function clearInfoPanels() {
 
 function getSelectionData(selection) {
   return selection.userData?.worldObject || selection.userData?.building || selection;
+}
+
+function renderNexusInfo() {
+  const display = getNexusDisplay();
+  nexusEl.classList.remove("hidden");
+
+  nexusEl.innerHTML = `
+    <div class="machine-row"><span>NEXUS Level</span><strong>${display.level}</strong></div>
+    <div class="machine-row"><span>Memory</span><strong>${display.memory}</strong></div>
+    <div class="machine-row"><span>Mission</span><strong>${display.activeMission}</strong></div>
+  `;
+}
+
+function renderNexusActions() {
+  if (canDeliverToNexusNow()) {
+    addAction("Deliver Current Mission Resources", () => {
+      deliverCurrentMissionToNexus();
+      renderNexusInfo();
+    });
+  }
 }
 
 function renderMachineInfo(data) {

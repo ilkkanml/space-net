@@ -1,37 +1,41 @@
 # ACTIVE_MILESTONE.md
 
 ## Aktif Milestone
-Milestone 06 — Conveyor & Storage
+Milestone 07 — NEXUS Missions
 
 ## Amaç
-Makine output buffer, conveyor hattı, processor input buffer ve storage arasında basit item transfer zincirini kurmak.
+Oyuncuya v0.1 core loop'unu yönlendiren basit görev zinciri eklemek ve NEXUS Core'a teslimat sistemi kurmak.
 
 ## Olacaklar
-- Basic Conveyor building
-- Conveyor direction: North / East / South / West
-- R tuşu ile placement sırasında conveyor yönü değiştirme
-- Conveyor carriedItem state
-- 1 item / transfer tick
-- Miner output -> Conveyor
-- Conveyor -> Conveyor
-- Conveyor -> Processor input
-- Processor output -> Conveyor
-- Conveyor -> Small Storage
-- Small Storage capacity: 100 total items
-- Storage item panel
-- Storage collect action
+- Objective / Mission Panel
+- Görev zinciri
+- NEXUS Core seçilince görev aksiyonları
+- Partial delivery
+- Mission progress tracking
+- NEXUS level state
+- Memory Fragment 01 unlock
+
+## Mission chain
+1. Wake the Core
+2. Gather Raw Materials
+3. Stabilize NEXUS Core
+4. Build Basic Miner
+5. Produce Iron Plate
+6. Connect Conveyor
+7. Start Copper Production
+8. Deliver Basic Materials
+9. Recover Memory Fragment 01
 
 ## Olmayacaklar
-- Conveyor pathfinding
-- Splitter / merger
-- Underground conveyor
-- Belt speed upgrade
-- Smart routing
-- Advanced logistics
-- Energy
-- Market
+- E.V.A. notification sistemi
+- Cutscene
+- Voiceover
+- Advanced quest UI
 - Backend
-- Save/load
+- Account sistemi
+- Event sistemi
+- Premium reward
+- Research unlock tree
 
 ## Kabul kriteri
-Basic Conveyor yerleştirilebilir. R ile yön değiştirilebilir. Miner output buffer’dan conveyor hattına item geçer. Conveyor zinciri item taşır. Processor recipe seçiliyse conveyor input kabul eder. Processor output conveyor ile storage’a taşınır. Storage 100 item kapasiteyle çalışır.
+Objective panel görünür. Görevler sırayla ilerler. NEXUS Core seçilince teslimat yapılabilir. Teslimatlar partial çalışır. Kaynak teslimi inventory'den düşer. Görevler tamamlandıkça sıradaki görev açılır. Memory Fragment 01 unlock olur.

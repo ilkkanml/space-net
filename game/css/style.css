@@ -53,6 +53,37 @@ body,
   color: rgba(233, 246, 255, 0.78);
 }
 
+.mission-panel {
+  top: 86px;
+  left: 16px;
+  width: 340px;
+  min-height: 150px;
+}
+
+.mission-title {
+  margin-top: 4px;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.mission-description {
+  margin-top: 8px;
+  color: rgba(233, 246, 255, 0.78);
+}
+
+.mission-progress {
+  margin-top: 10px;
+  display: grid;
+  gap: 4px;
+  color: rgba(233, 246, 255, 0.84);
+}
+
+.mission-complete {
+  margin-top: 8px;
+  color: #6ee7ff;
+  font-weight: 700;
+}
+
 .resource-bar {
   top: 16px;
   left: 50%;
@@ -140,8 +171,10 @@ body,
 .selection-panel {
   right: 16px;
   bottom: 16px;
-  width: 340px;
+  width: 350px;
   min-height: 190px;
+  max-height: 78vh;
+  overflow-y: auto;
 }
 
 .label {

@@ -7,9 +7,11 @@ import { createWorldObjects, setObjectHover, setObjectSelected } from "./world/w
 import { updateSelectionPanel, refreshSelectionPanel } from "./ui/selectionPanel.js";
 import { initResourceBar } from "./ui/resourceBar.js";
 import { initBuildMenu, setActiveBuildButton } from "./ui/buildMenu.js";
+import { initMissionPanel, refreshMissionPanel } from "./ui/missionPanel.js";
 import { addResource } from "./core/gameState.js";
 import { initProductionSystem, updateProduction } from "./systems/productionSystem.js";
 import { updateConveyors } from "./systems/conveyorSystem.js";
+import { initMissionSystem, updateMissions } from "./systems/missionSystem.js";
 import {
   initBuildSystem,
   startPlacement,
@@ -44,6 +46,8 @@ createAsteroidGround(scene);
 createGrid(scene);
 initResourceBar();
 initProductionSystem({ onStatus: setStatus });
+initMissionSystem({ onStatus: setStatus });
+initMissionPanel();
 
 const { selectableObjects } = createWorldObjects(scene);
 
@@ -256,11 +260,13 @@ function animate() {
 
   updateProduction(deltaTime);
   updateConveyors(deltaTime);
+  updateMissions();
 
   selectionRefreshTimer += deltaTime;
   if (selectionRefreshTimer >= 0.25) {
     selectionRefreshTimer = 0;
     refreshSelectionPanel();
+    refreshMissionPanel();
   }
 
   selectableObjects.forEach((object) => {
