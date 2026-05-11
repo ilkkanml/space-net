@@ -1,19 +1,16 @@
 # CHANGELOG.md
 
-## v0.1.0-m08 — E.V.A. Notifications QA Passed / Locked
+## v0.1.0-m09 — Save / Load & Persistence QA Passed / Locked
 
-- E.V.A. notification sistemi QA tarafından onaylandı.
-- Duplicate notification/spam engelleme çalışıyor.
-- E.V.A. state persistence için uygun temele sahip.
+- Save Game çalıştı.
+- Load Game çalıştı.
+- Browser refresh sonrası auto-restore çalıştı.
+- Resources, buildings, machines, conveyors, storage, missions, NEXUS ve E.V.A. state restore edildi.
+- Oyuncuya açık reset sistemi bulunmadığı doğrulandı.
+- Gizli developer Debug Clear Save dışında ilerleme silme sistemi yok.
 
-## v0.1.0-m09 — Save / Load & Persistence Started
+## v0.1.0-m10 — v0.1 Test Pass Started
 
-- Save/load system eklendi.
-- localStorage key `spaceNetSave_v0_1` tanımlandı.
-- saveVersion `0.1.0` tanımlandı.
-- Save Game ve Load Game UI eklendi.
-- Browser refresh sonrası otomatik save restore eklendi.
-- Building mesh restore sistemi eklendi.
-- Machine/conveyor/storage/mission/NEXUS/E.V.A. state persistence kapsamına alındı.
-- Oyuncuya açık reset eklenmedi.
-- Developer için gizli `window.spaceNetDebugClearSave()` fonksiyonu eklendi.
+- Aktif milestone v0.1 Test Pass olarak güncellendi.
+- Yeni özellik ekleme kapatıldı.
+- Full regression test checklist hazırlandı.

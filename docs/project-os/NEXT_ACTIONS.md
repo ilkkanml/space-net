@@ -2,26 +2,30 @@
 
 ## Sıradaki işler
 
-1. Milestone 09 update dosyalarını local klasöre kopyala.
-2. Aynı dosyaları GitHub'a yükle.
-3. Local server açıksa tarayıcıyı yenile.
-4. Save/load testlerini yap.
-5. Test geçerse QA Tester GPT'ye Milestone 09 QA Check yaptır.
-6. QA geçerse Milestone 09'u PASSED / LOCKED yap.
+1. Milestone 10 test planını uygula.
+2. Test sırasında yeni özellik ekleme.
+3. Kritik hata varsa BUG_REPORTS.md içine yaz.
+4. Kritik hata yoksa QA Tester GPT'ye v0.1 Test Pass QA Check yaptır.
+5. QA temizse v0.1.0 First Playable Prototype internal pass olarak kilitle.
 
-## Milestone 09 testleri
+## Milestone 10 testleri
 
-- Save Game butonu görünüyor mu?
-- Load Game butonu görünüyor mu?
-- Oyuncuya açık Reset / Baştan Başla / Clear Save butonu yok mu?
-- Kaynaklar kaydedilip sayfa yenilenince geri geliyor mu?
-- Yerleştirilen binalar sayfa yenilenince geri geliyor mu?
-- Basic Miner output buffer ve progress korunuyor mu?
-- Processor recipe/input/output/progress korunuyor mu?
-- Conveyor direction ve carried item korunuyor mu?
-- Storage items/capacity korunuyor mu?
-- Active mission ve completed mission state korunuyor mu?
-- Partial delivery progress korunuyor mu?
-- Memory Fragment 01 unlock state korunuyor mu?
-- E.V.A. notifications ve emittedEventIds korunuyor mu?
-- SaveVersion `0.1.0` olarak yazılıyor mu?
+- Oyun local server üzerinden açılıyor mu?
+- Kamera pan / zoom / Q-E rotate çalışıyor mu?
+- Grid, NEXUS Core, Iron Deposit, Copper Deposit görünüyor mu?
+- Iron Ore ve Copper Ore toplanıyor mu?
+- Build Menu çalışıyor mu?
+- Basic Miner deposit üzerine kuruluyor mu?
+- Basic Processor ve Small Storage boş alana kuruluyor mu?
+- Basic Conveyor yerleştiriliyor ve R ile yön değiştiriyor mu?
+- Miner otomatik üretim yapıyor mu?
+- Processor recipe seçip üretim yapıyor mu?
+- Conveyor item taşıyor mu?
+- Storage item alıyor ve collect ediliyor mu?
+- Mission chain baştan sona tamamlanıyor mu?
+- Memory Fragment 01 açılıyor mu?
+- E.V.A. mesajları tetikleniyor ve spam yapmıyor mu?
+- Save Game çalışıyor mu?
+- Browser refresh sonrası auto-restore çalışıyor mu?
+- Load Game aynı state'i geri getiriyor mu?
+- Oyuncuya açık Reset / Baştan Başla / Tüm ilerlemeyi sil butonu yok mu?
