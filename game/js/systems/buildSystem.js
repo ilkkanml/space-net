@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { buildingDefinitions } from "../data/buildings.js";
 import { spendCost, addBuilding } from "../core/gameState.js";
+import { createMachineState } from "./productionSystem.js";
 
 const CELL_SIZE = 2;
 const WORLD_LIMIT = 32;
@@ -24,11 +25,7 @@ export function initBuildSystem({ scene, onStatus, onBuildingSelected }) {
   placedBuildingsGroup.name = "Placed Buildings";
   scene.add(placedBuildingsGroup);
 
-  reserveInitialCells();
-}
-
-export function getSelectedBuildingId() {
-  return selectedBuildingId;
+  reserveInitialWorldObjectFootprints();
 }
 
 export function startPlacement(buildingId) {
@@ -93,6 +90,11 @@ export function tryPlaceBuilding(position, depositObject) {
     description: definition.description
   };
 
+  if (definition.isMachine) {
+    const outputResourceId = getDepositOutputResourceId(depositObject);
+    buildingData.machine = createMachineState(definition, { outputResourceId });
+  }
+
   mesh.userData.building = buildingData;
   placedBuildingsGroup.add(mesh);
   addBuilding(buildingData);
@@ -119,20 +121,22 @@ export function getPlacedBuildingFromObject(object) {
   return null;
 }
 
-function reserveInitialCells() {
-  reserveArea(0, 0, 4);
-  reserveArea(-12, -6, 3);
-  reserveArea(12, 6, 3);
+function getDepositOutputResourceId(depositObject) {
+  const worldObject = depositObject?.userData?.worldObject;
+  if (!worldObject) return null;
+  if (worldObject.id.includes("iron")) return "ironOre";
+  if (worldObject.id.includes("copper")) return "copperOre";
+  return null;
 }
 
-function reserveArea(x, z, radiusInCells) {
-  const centerCell = worldToCell({ x, z });
+function reserveInitialWorldObjectFootprints() {
+  reserveFootprint({ x: 0, z: 0 }, 3);
+  reserveFootprint({ x: -12, z: -6 }, 2);
+  reserveFootprint({ x: 12, z: 6 }, 2);
+}
 
-  for (let dx = -radiusInCells; dx <= radiusInCells; dx++) {
-    for (let dz = -radiusInCells; dz <= radiusInCells; dz++) {
-      occupiedCells.add(`${centerCell.x + dx},${centerCell.z + dz}`);
-    }
-  }
+function reserveFootprint(position, footprintSize) {
+  getCellsForFootprint(position, footprintSize).forEach((cell) => occupiedCells.add(cell));
 }
 
 function validatePlacement(buildingId, position, depositObject) {
@@ -188,13 +192,34 @@ function worldToCell(position) {
 }
 
 function getCellsForBuilding(position) {
+  return getCellsForFootprint(position, 2);
+}
+
+function getCellsForFootprint(position, footprintSize) {
   const center = worldToCell(position);
-  return [
-    `${center.x},${center.z}`,
-    `${center.x + 1},${center.z}`,
-    `${center.x},${center.z + 1}`,
-    `${center.x + 1},${center.z + 1}`
-  ];
+  const cells = [];
+
+  if (footprintSize === 2) {
+    cells.push(
+      `${center.x},${center.z}`,
+      `${center.x + 1},${center.z}`,
+      `${center.x},${center.z + 1}`,
+      `${center.x + 1},${center.z + 1}`
+    );
+    return cells;
+  }
+
+  if (footprintSize === 3) {
+    for (let dx = -1; dx <= 1; dx++) {
+      for (let dz = -1; dz <= 1; dz++) {
+        cells.push(`${center.x + dx},${center.z + dz}`);
+      }
+    }
+    return cells;
+  }
+
+  cells.push(`${center.x},${center.z}`);
+  return cells;
 }
 
 function createBuildingMesh(definition, isPreview) {

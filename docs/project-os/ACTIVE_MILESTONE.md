@@ -1,34 +1,38 @@
 # ACTIVE_MILESTONE.md
 
 ## Aktif Milestone
-Milestone 04 — Building Placement
+Milestone 05 — Machines & Production
 
 ## Amaç
-Oyuncunun kaynak maliyeti ödeyerek temel binaları grid üzerine yerleştirmesini sağlamak.
+Yerleştirilen makinelerin merkezi production loop ile çalışmasını sağlamak.
 
 ## Olacaklar
-- Build Menu UI
-- Placement mode
-- Placement preview / ghost
-- Basic Miner
-- Basic Processor
-- Small Storage
-- Cost check
-- Resource spending
-- Occupancy check
-- Basic Miner sadece Iron/Copper deposit üzerine kurulabilir
-- Basic Processor ve Small Storage boş grid alanına kurulabilir
-- Sağ panelde yerleştirilen bina bilgisi gösterilir
-- ESC veya Cancel ile placement iptal edilebilir
+- Basic Miner otomatik ham kaynak üretimi
+- Basic Processor recipe sistemi
+- Recipes:
+  - 2 Iron Ore -> 1 Iron Plate
+  - 2 Copper Ore -> 1 Copper Wire
+- Machine status:
+  - working
+  - idle
+  - inputShortage
+  - outputFull
+  - noRecipe
+- Machine input/output buffer
+- Production progress
+- Machine detail panel
+- Manual load/collect test aksiyonları
 
 ## Olmayacaklar
-- Miner otomatik üretim
-- Processor recipe sistemi
-- Conveyor
-- Storage kapasite mantığı
-- Görev sistemi
-- E.V.A.
-- Save/load
+- Conveyor transfer
+- Storage capacity logic
+- Energy
+- Market
+- Research
+- Backend
+- Upgrade sistemi
+- Splitter/merger
+- Advanced automation
 
 ## Kabul kriteri
-Yeterli kaynak toplandıktan sonra Basic Miner deposit üzerine kurulabilir. Basic Processor ve Small Storage boş alana kurulabilir. Kaynak maliyeti düşer. Geçersiz alana yerleştirme engellenir. Kamera, grid, selection ve resource bar bozulmaz.
+Basic Miner output buffer içine düzenli üretim yapar. Basic Processor seçilen recipe için input tüketir, output üretir, status doğru görünür. Output full/input shortage/no recipe durumları görülebilir. Conveyor/storage beklemeden production loop stabil çalışır.

@@ -53,11 +53,15 @@ export function addBuilding(building) {
   notifyStateChanged();
 }
 
+export function getBuildingById(buildingId) {
+  return gameState.buildings.find((building) => building.id === buildingId) ?? null;
+}
+
 export function subscribeToState(listener) {
   listeners.add(listener);
   return () => listeners.delete(listener);
 }
 
-function notifyStateChanged() {
+export function notifyStateChanged() {
   listeners.forEach((listener) => listener(gameState));
 }

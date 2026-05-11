@@ -4,7 +4,7 @@
 S.P.A.C.E. NET Studio
 
 ## Durum
-Initial Setup v1.0 tamamlandı. Milestone 01, Milestone 02 ve Milestone 03 test edildi ve geçti. v0.1.0 First Playable Prototype sıfırdan geliştiriliyor.
+Initial Setup v1.0 tamamlandı. Milestone 01, 02, 03 ve 04 test edildi ve geçti. v0.1.0 First Playable Prototype sıfırdan geliştiriliyor.
 
 ## Ana referans
 S.P.A.C.E. NET — Game Design Bible — Pre-Production Draft 1.0
@@ -26,9 +26,10 @@ S.P.A.C.E. NET — Game Design Bible — Pre-Production Draft 1.0
 - Milestone 01 — Scene & Camera: PASSED
 - Milestone 02 — Grid & World Objects: PASSED
 - Milestone 03 — Game State & Resources: PASSED
+- Milestone 04 — Building Placement: PASSED
 
 ## Aktif geliştirme hedefi
-Milestone 04 — Building Placement
+Milestone 05 — Machines & Production
 
 ## Sonraki iş
-Build Menu, placement mode, Basic Miner, Basic Processor ve Small Storage yerleştirme sistemi eklenecek.
+Basic Miner otomatik ham kaynak üretecek. Basic Processor recipe tabanlı üretim yapacak. Machine status ve production loop eklenecek.

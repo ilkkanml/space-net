@@ -9,7 +9,11 @@ export const buildingDefinitions = {
       copperOre: 5
     },
     allowedPlacement: "deposit",
-    description: "Basic extraction unit. In this milestone it can only be placed on Iron or Copper deposits."
+    isMachine: true,
+    machineKind: "miner",
+    duration: 3,
+    outputCapacity: 20,
+    description: "Basic extraction unit. Produces raw ore into its output buffer."
   },
   basicProcessor: {
     id: "basicProcessor",
@@ -21,7 +25,12 @@ export const buildingDefinitions = {
       copperOre: 5
     },
     allowedPlacement: "empty",
-    description: "Basic processing unit. Production recipes will be added in a later milestone."
+    isMachine: true,
+    machineKind: "processor",
+    duration: 4,
+    outputCapacity: 20,
+    inputCapacity: 20,
+    description: "Basic processing unit. Converts ore into processed materials using selected recipe."
   },
   smallStorage: {
     id: "smallStorage",
@@ -32,7 +41,8 @@ export const buildingDefinitions = {
       ironOre: 10
     },
     allowedPlacement: "empty",
-    description: "Small item storage. Capacity logic will be added in a later milestone."
+    isMachine: false,
+    description: "Small item storage. Capacity logic will be added in Milestone 06."
   }
 };
 

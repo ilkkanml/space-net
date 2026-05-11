@@ -4,10 +4,11 @@ import { createCamera, resizeCamera, rotateCamera, panCamera, zoomCamera } from 
 import { addLighting } from "./render/lighting.js";
 import { createGrid } from "./world/grid.js";
 import { createWorldObjects, setObjectHover, setObjectSelected } from "./world/worldObjects.js";
-import { updateSelectionPanel } from "./ui/selectionPanel.js";
+import { updateSelectionPanel, refreshSelectionPanel } from "./ui/selectionPanel.js";
 import { initResourceBar } from "./ui/resourceBar.js";
 import { initBuildMenu, setActiveBuildButton } from "./ui/buildMenu.js";
 import { addResource } from "./core/gameState.js";
+import { initProductionSystem, updateProduction } from "./systems/productionSystem.js";
 import {
   initBuildSystem,
   startPlacement,
@@ -40,6 +41,7 @@ addLighting(scene);
 createAsteroidGround(scene);
 createGrid(scene);
 initResourceBar();
+initProductionSystem({ onStatus: setStatus });
 
 const { selectableObjects } = createWorldObjects(scene);
 
@@ -64,6 +66,7 @@ initBuildMenu({
 });
 
 const clock = new THREE.Clock();
+let selectionRefreshTimer = 0;
 
 const state = {
   isDragging: false,
@@ -245,7 +248,16 @@ function setStatus(message) {
 }
 
 function animate() {
+  const deltaTime = clock.getDelta();
   const elapsed = clock.getElapsedTime();
+
+  updateProduction(deltaTime);
+
+  selectionRefreshTimer += deltaTime;
+  if (selectionRefreshTimer >= 0.25) {
+    selectionRefreshTimer = 0;
+    refreshSelectionPanel();
+  }
 
   selectableObjects.forEach((object) => {
     if (object.name === "NEXUS Core") {
