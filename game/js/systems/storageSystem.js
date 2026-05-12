@@ -3,27 +3,38 @@ import { resources } from "../data/resources.js";
 
 export function getStorageTotal(storage) {
   if (!storage) return 0;
+  normalizeStorage(storage);
   return Object.values(storage.items).reduce((sum, amount) => sum + amount, 0);
 }
 
 export function canStorageAccept(storage, amount = 1) {
+  if (!storage) return false;
+  normalizeStorage(storage);
   return getStorageTotal(storage) + amount <= storage.capacity;
 }
 
 export function addToStorage(storage, resourceId, amount = 1) {
+  if (!storage || !resourceId || amount <= 0) return false;
+  normalizeStorage(storage);
   if (!canStorageAccept(storage, amount)) return false;
+
   storage.items[resourceId] = (storage.items[resourceId] ?? 0) + amount;
   return true;
 }
 
 export function removeFromStorage(storage, resourceId, amount = 1) {
+  if (!storage || !resourceId || amount <= 0) return false;
+  normalizeStorage(storage);
   if ((storage.items[resourceId] ?? 0) < amount) return false;
+
   storage.items[resourceId] -= amount;
   return true;
 }
 
 export function collectStorageItems(building) {
   if (!building?.storage) return false;
+
+  normalizeStorage(building.storage);
 
   const entries = Object.entries(building.storage.items).filter(([, amount]) => amount > 0);
   if (entries.length === 0) return false;
@@ -40,6 +51,8 @@ export function collectStorageItems(building) {
 export function getStorageDisplay(storage) {
   if (!storage) return null;
 
+  normalizeStorage(storage);
+
   const total = getStorageTotal(storage);
   const items = Object.entries(storage.items)
     .filter(([, amount]) => amount > 0)
@@ -50,4 +63,9 @@ export function getStorageDisplay(storage) {
     capacity: `${total}/${storage.capacity}`,
     items: items || "Empty"
   };
+}
+
+function normalizeStorage(storage) {
+  storage.items ??= {};
+  storage.capacity = Number.isFinite(storage.capacity) && storage.capacity > 0 ? storage.capacity : 100;
 }
