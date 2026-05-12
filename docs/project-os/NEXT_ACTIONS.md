@@ -51,6 +51,39 @@ IMMEDIATE PRIORITIES
 - Fix conveyor transfer regressions
 
 --------------------------------------------------
+DEPARTMENT USAGE RULE
+--------------------------------------------------
+
+Department GPTs may review concept, scope and risk from summarized context.
+
+Real code is required before any department gives final approval for:
+- implementation
+- QA PASS
+- LOCK decision
+- refactor approval
+- save/load migration approval
+- runtime blocker closure
+
+If a department has not seen the real files, its output must be treated as advisory review only.
+
+--------------------------------------------------
+FUTURE INTERNAL TOOLING BACKLOG
+--------------------------------------------------
+
+Internal Code Execution / QA Automation System:
+- repo-aware builder
+- local build runner
+- browser launch automation
+- console error capture
+- Playwright or Puppeteer interaction tests
+- save/load regression automation
+- screenshot/log reporting
+- CI-style QA result summary
+
+Status:
+BACKLOG — future studio tooling.
+
+--------------------------------------------------
 NEXT TARGET AFTER QA
 --------------------------------------------------
 
