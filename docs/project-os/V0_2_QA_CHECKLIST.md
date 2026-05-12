@@ -11,6 +11,25 @@ Do not mark v0.2 or its milestones as LOCKED until this checklist is completed.
 
 ---
 
+## Recommended Manual Test Order
+
+Run this order first:
+
+1. Launch / Runtime Smoke Test
+2. v0.1 Regression Test
+3. Milestone 11 Data Expansion Test
+4. Machine Detail UI Test
+5. Selection / Highlight Test
+6. Conveyor Stress Test
+7. Recipe Switching Stress Test
+8. Save / Load Regression Test
+9. Long Session Stability Test
+10. Scope Guard Verification
+
+If a blocker appears, stop and record it in BUG_REPORTS.md before continuing.
+
+---
+
 ## 1. Launch / Runtime Smoke Test
 
 - [ ] Game opens locally without white screen
@@ -98,6 +117,13 @@ Pass note:
 
 ## 6. Conveyor Stress Test
 
+Minimum layout:
+- 2 miners
+- 3 processors
+- 10+ conveyors
+- 1 storage
+
+Checks:
 - [ ] Miner -> Conveyor -> Processor works
 - [ ] Processor -> Conveyor -> Storage works
 - [ ] Multiple conveyors transfer correctly
@@ -113,6 +139,10 @@ Pass note:
 
 ## 7. Recipe Switching Stress Test
 
+Minimum test:
+Rapidly switch recipes on the same Basic Processor at least 10 times.
+
+Checks:
 - [ ] Switching recipes resets progress safely
 - [ ] Rapid recipe switching does not crash
 - [ ] Input buffer remains understandable after recipe switch
@@ -126,6 +156,10 @@ Pass note:
 
 ## 8. Save / Load Regression Test
 
+Minimum test:
+Save while at least one machine has input, output, selected recipe and partial progress.
+
+Checks:
 - [ ] Save works with v0.2 resources
 - [ ] Load restores v0.2 resources
 - [ ] Save/load restores selected recipe
@@ -141,6 +175,10 @@ Pass note:
 
 ## 9. Long Session Stability Test
 
+Minimum test:
+Keep the game running with at least one active production chain.
+
+Checks:
 - [ ] Game runs 10 minutes without console error
 - [ ] Game runs 20 minutes without console error
 - [ ] Production continues over time
