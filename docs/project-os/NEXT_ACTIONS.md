@@ -1,7 +1,50 @@
-## Next Actions
+# NEXT ACTIONS
 
-1. Test mouse wheel zoom: zoom changes only scale, not angle.
-2. Test middle mouse hold + left/right drag: camera rotates smoothly.
-3. Test middle mouse hold + up/down drag: camera pitch/tilt changes smoothly.
-4. Test Q/E smooth rotation.
-5. Regression test build mode, remove mode, conveyor drag toggle and save/load.
+Current State:
+v0.1.0 First Playable Prototype completed and internally approved.
+
+Current Build Status:
+LOCKED
+
+--------------------------------------------------
+IMMEDIATE PRIORITIES
+--------------------------------------------------
+
+1. Stabilization Observation Phase
+- Observe long-session runtime behavior
+- Monitor save/load consistency
+- Monitor conveyor-heavy layouts
+- Validate sustained placement interactions
+
+2. Polish Pass
+- Camera smoothing adjustments
+- Conveyor visual feedback polish
+- Selection/remove highlight polish
+- UI transition polish
+- Panel animation polish
+
+3. Technical Cleanup
+- Cleanup/refactor review
+- Remove temporary debug remnants
+- Validate modular architecture consistency
+- Prepare safer expansion base for v0.2
+
+--------------------------------------------------
+NEXT TARGET VERSION
+--------------------------------------------------
+
+Target:
+v0.2.0 — Basic Production Expansion
+
+Planned Focus:
+- Iron Rod
+- Copper Cable
+- Basic Frame
+- Improved build UI
+- Improved machine UI
+
+--------------------------------------------------
+IMPORTANT RULE
+--------------------------------------------------
+
+Do not expand advanced systems before preserving v0.1 gameplay loop stability.
