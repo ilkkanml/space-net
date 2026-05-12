@@ -1,5 +1,5 @@
 import { gameState, addResource, removeResource, notifyStateChanged } from "../core/gameState.js";
-import { recipes } from "../data/recipes.js";
+import { recipes, getRecipeInputs } from "../data/recipes.js";
 import { resources } from "../data/resources.js";
 
 const MACHINE_STATUS = {
@@ -66,7 +66,7 @@ export function loadRecipeInputFromInventory(building) {
   let loadedBatches = 0;
 
   while (canLoadOneRecipeBatch(building.machine, recipe) && hasInventoryForRecipe(recipe)) {
-    Object.entries(recipe.input).forEach(([resourceId, amount]) => {
+    getRecipeInputs(recipe).forEach(({ resourceId, amount }) => {
       removeResource(resourceId, amount);
       building.machine.inputBuffer[resourceId] = (building.machine.inputBuffer[resourceId] ?? 0) + amount;
     });
@@ -172,7 +172,7 @@ function updateProcessor(building, deltaTime) {
   if (machine.progress >= recipe.duration) {
     machine.progress = 0;
 
-    Object.entries(recipe.input).forEach(([resourceId, amount]) => {
+    getRecipeInputs(recipe).forEach(({ resourceId, amount }) => {
       machine.inputBuffer[resourceId] -= amount;
     });
 
@@ -183,7 +183,7 @@ function updateProcessor(building, deltaTime) {
 }
 
 function hasRecipeInput(machine, recipe) {
-  return Object.entries(recipe.input).every(([resourceId, amount]) => {
+  return getRecipeInputs(recipe).every(({ resourceId, amount }) => {
     return (machine.inputBuffer[resourceId] ?? 0) >= amount;
   });
 }
@@ -196,18 +196,18 @@ function hasOutputSpace(machine, recipe) {
 
 function canLoadOneRecipeBatch(machine, recipe) {
   const currentInputTotal = getBufferTotal(machine.inputBuffer);
-  const recipeInputTotal = Object.values(recipe.input).reduce((sum, amount) => sum + amount, 0);
+  const recipeInputTotal = getRecipeInputs(recipe).reduce((sum, input) => sum + input.amount, 0);
   return currentInputTotal + recipeInputTotal <= machine.inputCapacity;
 }
 
 function hasInventoryForRecipe(recipe) {
-  return Object.entries(recipe.input).every(([resourceId, amount]) => {
+  return getRecipeInputs(recipe).every(({ resourceId, amount }) => {
     return gameState.resources[resourceId] >= amount;
   });
 }
 
 function getBufferTotal(buffer) {
-  return Object.values(buffer).reduce((sum, amount) => sum + amount, 0);
+  return Object.values(buffer).reduce((sum, amount]) => sum + amount, 0);
 }
 
 function formatBuffer(buffer) {
