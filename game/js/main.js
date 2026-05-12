@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { createScene, createAsteroidGround } from "./render/scene.js";
-import { createCamera, resizeCamera, rotateCamera, panCamera, zoomCamera } from "./render/camera.js";
+import { createCamera, resizeCamera, rotateCamera, setCameraRotationInput, orbitCameraWithMouse, updateCamera, panCamera, zoomCamera } from "./render/camera.js";
 import { addLighting } from "./render/lighting.js";
 import { createGrid } from "./world/grid.js";
 import { createWorldObjects, setObjectHover, setObjectSelected } from "./world/worldObjects.js";
@@ -108,6 +108,8 @@ const state = {
   lastY: 0,
   hoveredObject: null,
   selectedObject: null,
+  cameraRotationDirection: 0,
+  isCameraOrbitDragging: false,
   isBuildDragging: false,
   lastBuildCellKey: null,
   isRemoveMode: false,
@@ -119,6 +121,17 @@ const state = {
 canvas.addEventListener("pointerdown", (event) => {
   updatePointer(event);
   canvas.setPointerCapture(event.pointerId);
+
+  if (event.button === 1) {
+    event.preventDefault();
+    state.isCameraOrbitDragging = true;
+    state.hasDragged = false;
+    state.lastX = event.clientX;
+    state.lastY = event.clientY;
+    return;
+  }
+
+  if (event.button !== 0) return;
 
   if (state.isRemoveMode) {
     state.isRemoveDragging = true;
@@ -144,6 +157,21 @@ canvas.addEventListener("pointerdown", (event) => {
 
 canvas.addEventListener("pointermove", (event) => {
   updatePointer(event);
+
+  if (state.isCameraOrbitDragging) {
+    event.preventDefault();
+    const deltaX = event.clientX - state.lastX;
+    const deltaY = event.clientY - state.lastY;
+
+    if (Math.abs(deltaX) + Math.abs(deltaY) > 1) {
+      state.hasDragged = true;
+      orbitCameraWithMouse(camera, deltaX, deltaY);
+    }
+
+    state.lastX = event.clientX;
+    state.lastY = event.clientY;
+    return;
+  }
 
   if (state.isRemoveMode && state.isRemoveDragging) {
     const position = getGroundPosition();
@@ -194,6 +222,12 @@ canvas.addEventListener("pointermove", (event) => {
 });
 
 canvas.addEventListener("pointerup", (event) => {
+  if (state.isCameraOrbitDragging) {
+    state.isCameraOrbitDragging = false;
+    canvas.releasePointerCapture(event.pointerId);
+    return;
+  }
+
   if (state.isRemoveMode && state.isRemoveDragging) {
     state.isRemoveDragging = false;
     state.lastRemoveCellKey = null;
@@ -229,11 +263,27 @@ canvas.addEventListener("wheel", (event) => {
   zoomCamera(camera, event.deltaY);
 }, { passive: false });
 
+canvas.addEventListener("auxclick", (event) => {
+  if (event.button === 1) event.preventDefault();
+});
+
+canvas.addEventListener("contextmenu", (event) => {
+  if (state.isCameraOrbitDragging) event.preventDefault();
+});
+
 window.addEventListener("keydown", (event) => {
   const key = event.key.toLowerCase();
 
-  if (key === "q") rotateCamera(camera, -1);
-  if (key === "e") rotateCamera(camera, 1);
+  if (key === "q") {
+    state.cameraRotationDirection = -1;
+    if (!event.repeat) rotateCamera(camera, -1);
+  }
+
+  if (key === "e") {
+    state.cameraRotationDirection = 1;
+    if (!event.repeat) rotateCamera(camera, 1);
+  }
+
   if (key === "r") rotatePlacementDirection();
 
   if (key === "delete" || key === "backspace") {
@@ -249,6 +299,15 @@ window.addEventListener("keydown", (event) => {
     cancelPlacement();
     setActiveBuildButton(null);
     setRemoveModeActive(false);
+  }
+});
+
+window.addEventListener("keyup", (event) => {
+  const key = event.key.toLowerCase();
+
+  if ((key === "q" && state.cameraRotationDirection === -1) ||
+      (key === "e" && state.cameraRotationDirection === 1)) {
+    state.cameraRotationDirection = 0;
   }
 });
 
@@ -466,6 +525,9 @@ function setStatus(message) {
 function animate() {
   const deltaTime = clock.getDelta();
   const elapsed = clock.getElapsedTime();
+
+  setCameraRotationInput(camera, state.cameraRotationDirection, deltaTime);
+  updateCamera(camera, deltaTime);
 
   updateProduction(deltaTime);
   updateConveyors(deltaTime);

@@ -1,7 +1,5 @@
-# BUG_REPORTS.md
-
-## Milestone 10 Hotfix
+## Milestone 10 Hotfix — Camera UX Correction
 
 | ID | Öncelik | Sistem | Açıklama | Durum |
 |---|---|---|---|---|
-| BUG-M10-005 | Medium | Remove Mode | Remove modunda tıkla-sürükle seçimi yalnızca ekleme yapıyordu; seçili conveyor üzerinden tekrar sürükleyince seçim iptal olmuyordu. Drag toggle standardına göre düzeltildi. | Fixed |
+| M10-CAM-02 | High | Camera UX | ZoomPitch_BirdView yaklaşımı şehir kurma standardına uymadı; zoom sırasında kamera açısının otomatik değişmesi kaldırıldı. | Fixed |
