@@ -1,7 +1,7 @@
 import { resourceOrder } from "../data/resources.js";
 import { firstMissionId } from "../data/missions.js";
 
-export const SAVE_VERSION = "0.1.0";
+export const SAVE_VERSION = "0.2.0";
 
 export const gameState = createInitialGameState();
 
@@ -30,6 +30,7 @@ export function createInitialGameState() {
 
 export function replaceGameState(loadedState) {
   const merged = deepMerge(createInitialGameState(), sanitizeLoadedState(loadedState));
+  merged.version = SAVE_VERSION;
 
   Object.keys(gameState).forEach((key) => delete gameState[key]);
   Object.assign(gameState, merged);
