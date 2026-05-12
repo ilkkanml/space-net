@@ -10,6 +10,9 @@ const MACHINE_STATUS = {
   NO_RECIPE: "noRecipe"
 };
 
+const MAX_PRODUCTION_STEPS_PER_TICK = 4;
+const MAX_BATCH_LOADS_PER_CLICK = 100;
+
 let statusCallback = null;
 
 export function initProductionSystem({ onStatus }) {
@@ -17,15 +20,19 @@ export function initProductionSystem({ onStatus }) {
 }
 
 export function updateProduction(deltaTime) {
+  const safeDelta = Number.isFinite(deltaTime) && deltaTime > 0 ? deltaTime : 0;
+
   gameState.buildings.forEach((building) => {
-    if (!building.machine) return;
+    if (!building?.machine) return;
+
+    normalizeMachineState(building.machine);
 
     if (building.machine.kind === "miner") {
-      updateMiner(building, deltaTime);
+      updateMiner(building, safeDelta);
     }
 
     if (building.machine.kind === "processor") {
-      updateProcessor(building, deltaTime);
+      updateProcessor(building, safeDelta);
     }
   });
 }
@@ -47,6 +54,9 @@ export function createMachineState(definition, extra = {}) {
 
 export function setRecipe(building, recipeId) {
   if (!building?.machine || building.machine.kind !== "processor") return;
+  if (!recipes[recipeId]) return;
+
+  normalizeMachineState(building.machine);
 
   building.machine.recipeId = recipeId;
   building.machine.progress = 0;
@@ -57,6 +67,8 @@ export function setRecipe(building, recipeId) {
 export function loadRecipeInputFromInventory(building) {
   if (!building?.machine || building.machine.kind !== "processor") return false;
 
+  normalizeMachineState(building.machine);
+
   const recipe = recipes[building.machine.recipeId];
   if (!recipe) {
     statusCallback?.("No recipe selected");
@@ -65,8 +77,13 @@ export function loadRecipeInputFromInventory(building) {
 
   let loadedBatches = 0;
 
-  while (canLoadOneRecipeBatch(building.machine, recipe) && hasInventoryForRecipe(recipe)) {
+  while (
+    loadedBatches < MAX_BATCH_LOADS_PER_CLICK &&
+    canLoadOneRecipeBatch(building.machine, recipe) &&
+    hasInventoryForRecipe(recipe)
+  ) {
     getRecipeInputs(recipe).forEach(({ resourceId, amount }) => {
+      if (amount <= 0) return;
       removeResource(resourceId, amount);
       building.machine.inputBuffer[resourceId] = (building.machine.inputBuffer[resourceId] ?? 0) + amount;
     });
@@ -91,6 +108,8 @@ export function loadRecipeInputFromInventory(building) {
 export function collectMachineOutput(building) {
   if (!building?.machine) return false;
 
+  normalizeMachineState(building.machine);
+
   const outputEntries = Object.entries(building.machine.outputBuffer).filter(([, amount]) => amount > 0);
   if (outputEntries.length === 0) {
     statusCallback?.("Output buffer empty");
@@ -108,6 +127,8 @@ export function collectMachineOutput(building) {
 
 export function getMachineDisplay(machine) {
   if (!machine) return "";
+
+  normalizeMachineState(machine);
 
   const input = formatBuffer(machine.inputBuffer);
   const output = formatBuffer(machine.outputBuffer);
@@ -128,6 +149,7 @@ function updateMiner(building, deltaTime) {
 
   if (!resourceId) {
     machine.status = MACHINE_STATUS.IDLE;
+    machine.progress = 0;
     return;
   }
 
@@ -139,9 +161,22 @@ function updateMiner(building, deltaTime) {
   machine.status = MACHINE_STATUS.WORKING;
   machine.progress += deltaTime;
 
-  if (machine.progress >= machine.duration) {
-    machine.progress = 0;
+  let steps = 0;
+  while (machine.progress >= machine.duration && steps < MAX_PRODUCTION_STEPS_PER_TICK) {
+    machine.progress -= machine.duration;
+    steps += 1;
+
+    if (getBufferTotal(machine.outputBuffer) >= machine.outputCapacity) {
+      machine.status = MACHINE_STATUS.OUTPUT_FULL;
+      machine.progress = 0;
+      break;
+    }
+
     machine.outputBuffer[resourceId] = (machine.outputBuffer[resourceId] ?? 0) + 1;
+  }
+
+  if (steps >= MAX_PRODUCTION_STEPS_PER_TICK) {
+    machine.progress = 0;
   }
 }
 
@@ -169,16 +204,28 @@ function updateProcessor(building, deltaTime) {
   machine.status = MACHINE_STATUS.WORKING;
   machine.progress += deltaTime;
 
-  if (machine.progress >= recipe.duration) {
-    machine.progress = 0;
+  let steps = 0;
+  while (machine.progress >= recipe.duration && steps < MAX_PRODUCTION_STEPS_PER_TICK) {
+    if (!hasRecipeInput(machine, recipe) || !hasOutputSpace(machine, recipe)) {
+      machine.progress = 0;
+      break;
+    }
+
+    machine.progress -= recipe.duration;
+    steps += 1;
 
     getRecipeInputs(recipe).forEach(({ resourceId, amount }) => {
-      machine.inputBuffer[resourceId] -= amount;
+      machine.inputBuffer[resourceId] = Math.max(0, (machine.inputBuffer[resourceId] ?? 0) - amount);
     });
 
     Object.entries(recipe.output).forEach(([resourceId, amount]) => {
+      if (amount <= 0) return;
       machine.outputBuffer[resourceId] = (machine.outputBuffer[resourceId] ?? 0) + amount;
     });
+  }
+
+  if (steps >= MAX_PRODUCTION_STEPS_PER_TICK) {
+    machine.progress = 0;
   }
 }
 
@@ -190,13 +237,13 @@ function hasRecipeInput(machine, recipe) {
 
 function hasOutputSpace(machine, recipe) {
   const currentTotal = getBufferTotal(machine.outputBuffer);
-  const outputTotal = Object.values(recipe.output).reduce((sum, amount) => sum + amount, 0);
+  const outputTotal = Object.values(recipe.output ?? {}).reduce((sum, amount) => sum + Math.max(0, amount), 0);
   return currentTotal + outputTotal <= machine.outputCapacity;
 }
 
 function canLoadOneRecipeBatch(machine, recipe) {
   const currentInputTotal = getBufferTotal(machine.inputBuffer);
-  const recipeInputTotal = getRecipeInputs(recipe).reduce((sum, input) => sum + input.amount, 0);
+  const recipeInputTotal = getRecipeInputs(recipe).reduce((sum, input) => sum + Math.max(0, input.amount), 0);
   return currentInputTotal + recipeInputTotal <= machine.inputCapacity;
 }
 
@@ -207,12 +254,35 @@ function hasInventoryForRecipe(recipe) {
 }
 
 function getBufferTotal(buffer) {
+  normalizeBuffer(buffer);
   return Object.values(buffer).reduce((sum, amount) => sum + amount, 0);
 }
 
 function formatBuffer(buffer) {
+  normalizeBuffer(buffer);
   return Object.entries(buffer)
     .filter(([, amount]) => amount > 0)
     .map(([resourceId, amount]) => `${amount} ${resources[resourceId]?.shortName ?? resourceId}`)
     .join(", ");
+}
+
+function normalizeMachineState(machine) {
+  machine.status ??= MACHINE_STATUS.IDLE;
+  machine.inputBuffer ??= {};
+  machine.outputBuffer ??= {};
+  normalizeBuffer(machine.inputBuffer);
+  normalizeBuffer(machine.outputBuffer);
+  machine.progress = Number.isFinite(machine.progress) && machine.progress >= 0 ? machine.progress : 0;
+  machine.duration = Number.isFinite(machine.duration) && machine.duration > 0 ? machine.duration : 1;
+  machine.inputCapacity = Number.isFinite(machine.inputCapacity) && machine.inputCapacity > 0 ? machine.inputCapacity : 20;
+  machine.outputCapacity = Number.isFinite(machine.outputCapacity) && machine.outputCapacity > 0 ? machine.outputCapacity : 20;
+}
+
+function normalizeBuffer(buffer) {
+  Object.keys(buffer ?? {}).forEach((resourceId) => {
+    const amount = buffer[resourceId];
+    if (!Number.isFinite(amount) || amount <= 0) {
+      delete buffer[resourceId];
+    }
+  });
 }
