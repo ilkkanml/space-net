@@ -1,3 +1,4 @@
+import { gameState } from "../core/gameState.js";
 import { resources } from "../data/resources.js";
 import { recipes, recipeOrder, getRecipeInputs } from "../data/recipes.js";
 import {
@@ -37,13 +38,16 @@ export function updateSelectionPanel(selection, onCollectResource) {
   lastNexusCanDeliver = null;
 
   if (!selection) {
-    nameEl.textContent = "No machine selected";
-    typeEl.textContent = "Click a machine or world object";
-    descriptionEl.textContent = "";
+    renderEmptySelection();
     return;
   }
 
   const data = getSelectionData(selection);
+  if (!isSelectionStillValid(data)) {
+    currentSelection = null;
+    renderEmptySelection();
+    return;
+  }
 
   nameEl.textContent = data.name;
   typeEl.textContent = `${data.type} • ${data.size ?? "Object"}`;
@@ -81,6 +85,13 @@ export function refreshSelectionPanel() {
   if (!currentSelection) return;
 
   const data = getSelectionData(currentSelection);
+  if (!isSelectionStillValid(data)) {
+    currentSelection = null;
+    actionsEl.innerHTML = "";
+    clearInfoPanels();
+    renderEmptySelection();
+    return;
+  }
 
   if (data.id === "nexus_core_01") {
     renderNexusInfo();
@@ -90,6 +101,12 @@ export function refreshSelectionPanel() {
   if (data.machine) renderMachineInfo(data);
   if (data.storage) renderStorageInfo(data);
   if (data.conveyor) renderConveyorInfo(data);
+}
+
+function renderEmptySelection() {
+  nameEl.textContent = "No machine selected";
+  typeEl.textContent = "Click a machine or world object";
+  descriptionEl.textContent = "";
 }
 
 function clearInfoPanels() {
@@ -105,6 +122,14 @@ function clearInfoPanels() {
 
 function getSelectionData(selection) {
   return selection.userData?.worldObject || selection.userData?.building || selection;
+}
+
+function isSelectionStillValid(data) {
+  if (!data) return false;
+  if (data.id === "nexus_core_01") return true;
+  if (data.collectible) return true;
+  if (!data.id || (!data.machine && !data.storage && !data.conveyor)) return true;
+  return gameState.buildings.some((building) => building.id === data.id);
 }
 
 function renderNexusInfo() {
@@ -185,12 +210,14 @@ function renderMachineActions(data) {
     addRecipeSelector(data);
 
     addAction("Load Input From Inventory", () => {
+      if (!isSelectionStillValid(data)) return;
       loadRecipeInputFromInventory(data);
       renderMachineInfo(data);
     });
   }
 
   addAction("Collect Machine Output", () => {
+    if (!isSelectionStillValid(data)) return;
     collectMachineOutput(data);
     renderMachineInfo(data);
   });
@@ -206,7 +233,6 @@ function addRecipeSelector(data) {
 
   const select = document.createElement("select");
   select.className = "recipe-selector";
-  select.value = data.machine.recipeId ?? "";
 
   const emptyOption = document.createElement("option");
   emptyOption.value = "";
@@ -223,8 +249,10 @@ function addRecipeSelector(data) {
     select.append(option);
   });
 
+  select.value = data.machine.recipeId ?? "";
+
   select.addEventListener("change", () => {
-    if (!select.value) return;
+    if (!select.value || !isSelectionStillValid(data)) return;
     setRecipe(data, select.value);
     renderMachineInfo(data);
   });
@@ -286,6 +314,7 @@ function renderStorageInfo(data) {
 
 function renderStorageActions(data) {
   addAction("Collect Storage Items", () => {
+    if (!isSelectionStillValid(data)) return;
     collectStorageItems(data);
     renderStorageInfo(data);
   });
