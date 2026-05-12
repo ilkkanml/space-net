@@ -20,7 +20,7 @@ export function saveGame() {
 }
 
 export function hasSavedGame() {
-  return Boolean(getSavedGameRaw());
+  return Boolean(getSavedGameRaw().raw);
 }
 
 export function loadGame() {
