@@ -49,6 +49,8 @@ export function updateSelectionPanel(selection, onCollectResource) {
     return;
   }
 
+  normalizeMachineState(data);
+
   nameEl.textContent = data.name;
   typeEl.textContent = `${data.type} • ${data.size ?? "Object"}`;
   descriptionEl.textContent = data.description ?? "";
@@ -93,6 +95,8 @@ export function refreshSelectionPanel() {
     return;
   }
 
+  normalizeMachineState(data);
+
   if (data.id === "nexus_core_01") {
     renderNexusInfo();
     refreshNexusActionsIfNeeded();
@@ -132,6 +136,16 @@ function isSelectionStillValid(data) {
   return gameState.buildings.some((building) => building.id === data.id);
 }
 
+function normalizeMachineState(data) {
+  if (!data?.machine) return;
+
+  data.machine.inputBuffer ??= {};
+  data.machine.outputBuffer ??= {};
+  data.machine.progress = Number.isFinite(data.machine.progress) ? data.machine.progress : 0;
+  data.machine.duration = Number.isFinite(data.machine.duration) && data.machine.duration > 0 ? data.machine.duration : 1;
+  data.machine.status ??= "idle";
+}
+
 function renderNexusInfo() {
   const display = getNexusDisplay();
   nexusEl.classList.remove("hidden");
@@ -166,6 +180,13 @@ function refreshNexusActionsIfNeeded() {
 }
 
 function renderMachineInfo(data) {
+  if (!data?.machine || !isSelectionStillValid(data)) {
+    machineEl.classList.add("hidden");
+    return;
+  }
+
+  normalizeMachineState(data);
+
   const machine = data.machine;
   const display = getMachineDisplay(machine);
   const recipe = recipes[machine.recipeId];
@@ -177,7 +198,7 @@ function renderMachineInfo(data) {
     <div class="machine-detail-header">
       <div>
         <div class="panel-section-title">MACHINE DETAIL</div>
-        <div class="machine-detail-name">${data.name}</div>
+        <div class="machine-detail-name">${data.name ?? "Unknown Machine"}</div>
       </div>
       <span class="machine-status-pill ${getStatusClass(display.status)}">${formatStatus(display.status)}</span>
     </div>
@@ -211,6 +232,7 @@ function renderMachineActions(data) {
 
     addAction("Load Input From Inventory", () => {
       if (!isSelectionStillValid(data)) return;
+      normalizeMachineState(data);
       loadRecipeInputFromInventory(data);
       renderMachineInfo(data);
     });
@@ -218,6 +240,7 @@ function renderMachineActions(data) {
 
   addAction("Collect Machine Output", () => {
     if (!isSelectionStillValid(data)) return;
+    normalizeMachineState(data);
     collectMachineOutput(data);
     renderMachineInfo(data);
   });
@@ -253,6 +276,7 @@ function addRecipeSelector(data) {
 
   select.addEventListener("change", () => {
     if (!select.value || !isSelectionStillValid(data)) return;
+    normalizeMachineState(data);
     setRecipe(data, select.value);
     renderMachineInfo(data);
   });
@@ -272,7 +296,7 @@ function renderInputSlots(machine, recipe, fallbackText) {
   }
 
   return inputs.map(({ resourceId, amount }) => {
-    const current = machine.inputBuffer[resourceId] ?? 0;
+    const current = machine.inputBuffer?.[resourceId] ?? 0;
     return renderSlot(resourceId, `${current}/${amount}`);
   }).join("");
 }
@@ -285,7 +309,7 @@ function renderOutputSlots(machine, recipe, fallbackText) {
   }
 
   return outputs.map(([resourceId, amount]) => {
-    const current = machine.outputBuffer[resourceId] ?? 0;
+    const current = machine.outputBuffer?.[resourceId] ?? 0;
     return renderSlot(resourceId, `${current}/${amount}`);
   }).join("");
 }
