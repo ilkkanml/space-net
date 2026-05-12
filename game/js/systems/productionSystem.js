@@ -207,7 +207,7 @@ function hasInventoryForRecipe(recipe) {
 }
 
 function getBufferTotal(buffer) {
-  return Object.values(buffer).reduce((sum, amount]) => sum + amount, 0);
+  return Object.values(buffer).reduce((sum, amount) => sum + amount, 0);
 }
 
 function formatBuffer(buffer) {
