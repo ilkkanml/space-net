@@ -1,6 +1,11 @@
 import { gameState, replaceGameState, SAVE_VERSION } from "../core/gameState.js";
 
-export const SAVE_KEY = "spaceNetSave_v0_1";
+export const SAVE_KEY = "spaceNetSave_v0_2";
+
+const SUPPORTED_SAVE_VERSIONS = [
+  "0.1.0",
+  "0.2.0"
+];
 
 export function saveGame() {
   const payload = {
@@ -24,7 +29,7 @@ export function loadGame() {
   try {
     const payload = JSON.parse(raw);
 
-    if (payload.saveVersion !== SAVE_VERSION) {
+    if (!SUPPORTED_SAVE_VERSIONS.includes(payload.saveVersion)) {
       return {
         ok: false,
         reason: `Unsupported save version: ${payload.saveVersion ?? "unknown"}`
@@ -32,7 +37,12 @@ export function loadGame() {
     }
 
     replaceGameState(payload.gameState);
-    return { ok: true, payload };
+
+    return {
+      ok: true,
+      payload,
+      migrated: payload.saveVersion !== SAVE_VERSION
+    };
   } catch (error) {
     return { ok: false, reason: "Save file is corrupted" };
   }
