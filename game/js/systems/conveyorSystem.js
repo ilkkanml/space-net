@@ -1,5 +1,5 @@
 import { gameState, notifyStateChanged } from "../core/gameState.js";
-import { recipes } from "../data/recipes.js";
+import { recipes, getRecipeInputs } from "../data/recipes.js";
 import { resources } from "../data/resources.js";
 import { addToStorage, canStorageAccept, removeFromStorage } from "./storageSystem.js";
 
@@ -150,7 +150,9 @@ function canTargetAccept(target, resourceId, amount) {
   if (target.machine?.kind === "processor") {
     const recipe = recipes[target.machine.recipeId];
     if (!recipe) return false;
-    if (!Object.hasOwn(recipe.input, resourceId)) return false;
+
+    const allowedInput = getRecipeInputs(recipe).some((input) => input.resourceId === resourceId);
+    if (!allowedInput) return false;
 
     const currentInputTotal = Object.values(target.machine.inputBuffer).reduce((sum, value) => sum + value, 0);
     return currentInputTotal + amount <= target.machine.inputCapacity;
@@ -208,11 +210,13 @@ function getBuildingCells(building) {
 
   if (footprintSize === 3) {
     const cells = [];
+
     for (let dx = -1; dx <= 1; dx++) {
       for (let dz = -1; dz <= 1; dz++) {
         cells.push(`${center.x + dx},${center.z + dz}`);
       }
     }
+
     return cells;
   }
 
