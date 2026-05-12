@@ -4,6 +4,7 @@ import { resources } from "../data/resources.js";
 import { addToStorage, canStorageAccept, removeFromStorage } from "./storageSystem.js";
 
 const CELL_SIZE = 2;
+const MAX_CONVEYOR_STEPS_PER_TICK = 4;
 
 const directionVectors = {
   east: { x: 1, z: 0 },
@@ -18,14 +19,22 @@ export function updateConveyors(deltaTime) {
   gameState.buildings.forEach((building) => {
     if (!building.conveyor) return;
 
+    normalizeConveyor(building.conveyor);
+
     building.conveyor.transferTimer += deltaTime;
 
-    if (building.conveyor.transferTimer < building.conveyor.transferInterval) return;
+    let steps = 0;
+    while (building.conveyor.transferTimer >= building.conveyor.transferInterval && steps < MAX_CONVEYOR_STEPS_PER_TICK) {
+      building.conveyor.transferTimer -= building.conveyor.transferInterval;
+      steps += 1;
 
-    building.conveyor.transferTimer = 0;
+      if (tryMoveConveyor(building)) {
+        changed = true;
+      }
+    }
 
-    if (tryMoveConveyor(building)) {
-      changed = true;
+    if (steps >= MAX_CONVEYOR_STEPS_PER_TICK) {
+      building.conveyor.transferTimer = 0;
     }
   });
 
@@ -34,6 +43,8 @@ export function updateConveyors(deltaTime) {
 
 export function getConveyorDisplay(conveyor) {
   if (!conveyor) return null;
+
+  normalizeConveyor(conveyor);
 
   return {
     direction: conveyor.direction,
@@ -45,7 +56,11 @@ export function getConveyorDisplay(conveyor) {
 }
 
 function tryMoveConveyor(conveyorBuilding) {
+  if (!conveyorBuilding?.conveyor || !conveyorBuilding?.position) return false;
+
   const conveyor = conveyorBuilding.conveyor;
+  normalizeConveyor(conveyor);
+
   const vector = directionVectors[conveyor.direction] ?? directionVectors.east;
 
   const sourcePoint = {
@@ -62,6 +77,11 @@ function tryMoveConveyor(conveyorBuilding) {
   const target = findBuildingAtPoint(targetPoint, conveyorBuilding.id);
 
   if (conveyor.carriedItem) {
+    if (!isValidCarriedItem(conveyor.carriedItem)) {
+      conveyor.carriedItem = null;
+      return true;
+    }
+
     if (target && pushItemToTarget(target, conveyor.carriedItem.resourceId, conveyor.carriedItem.amount)) {
       conveyor.carriedItem = null;
       return true;
@@ -85,7 +105,7 @@ function findBuildingAtPoint(point, excludeId) {
   const cellKey = worldToCellKey(point);
 
   return gameState.buildings.find((building) => {
-    if (building.id === excludeId) return false;
+    if (!building || building.id === excludeId || !building.position) return false;
     const cells = getBuildingCells(building);
     return cells.includes(cellKey);
   }) ?? null;
@@ -101,17 +121,22 @@ function peekTransferableItem(source, target) {
 }
 
 function getSourceItems(source) {
+  if (!source) return [];
+
   if (source.conveyor?.carriedItem) {
-    return [source.conveyor.carriedItem];
+    normalizeConveyor(source.conveyor);
+    return isValidCarriedItem(source.conveyor.carriedItem) ? [source.conveyor.carriedItem] : [];
   }
 
   if (source.machine) {
+    normalizeMachineBuffers(source.machine);
     return Object.entries(source.machine.outputBuffer)
       .filter(([, amount]) => amount > 0)
       .map(([resourceId]) => ({ resourceId, amount: 1 }));
   }
 
   if (source.storage) {
+    source.storage.items ??= {};
     return Object.entries(source.storage.items)
       .filter(([, amount]) => amount > 0)
       .map(([resourceId]) => ({ resourceId, amount: 1 }));
@@ -121,14 +146,19 @@ function getSourceItems(source) {
 }
 
 function pullItemFromSource(source, resourceId, amount) {
+  if (!source || !resourceId || amount <= 0) return false;
+
   if (source.conveyor?.carriedItem?.resourceId === resourceId) {
     source.conveyor.carriedItem = null;
     return true;
   }
 
-  if (source.machine && (source.machine.outputBuffer[resourceId] ?? 0) >= amount) {
-    source.machine.outputBuffer[resourceId] -= amount;
-    return true;
+  if (source.machine) {
+    normalizeMachineBuffers(source.machine);
+    if ((source.machine.outputBuffer[resourceId] ?? 0) >= amount) {
+      source.machine.outputBuffer[resourceId] -= amount;
+      return true;
+    }
   }
 
   if (source.storage) {
@@ -139,7 +169,10 @@ function pullItemFromSource(source, resourceId, amount) {
 }
 
 function canTargetAccept(target, resourceId, amount) {
+  if (!target || !resourceId || amount <= 0) return false;
+
   if (target.conveyor) {
+    normalizeConveyor(target.conveyor);
     return !target.conveyor.carriedItem;
   }
 
@@ -148,6 +181,8 @@ function canTargetAccept(target, resourceId, amount) {
   }
 
   if (target.machine?.kind === "processor") {
+    normalizeMachineBuffers(target.machine);
+
     const recipe = recipes[target.machine.recipeId];
     if (!recipe) return false;
 
@@ -174,6 +209,7 @@ function pushItemToTarget(target, resourceId, amount) {
   }
 
   if (target.machine?.kind === "processor") {
+    normalizeMachineBuffers(target.machine);
     target.machine.inputBuffer[resourceId] = (target.machine.inputBuffer[resourceId] ?? 0) + amount;
     return true;
   }
@@ -188,9 +224,10 @@ function worldToCellKey(position) {
 }
 
 function getBuildingCells(building) {
+  const position = building?.position ?? { x: 0, z: 0 };
   const center = {
-    x: Math.round(building.position.x / CELL_SIZE),
-    z: Math.round(building.position.z / CELL_SIZE)
+    x: Math.round(position.x / CELL_SIZE),
+    z: Math.round(position.z / CELL_SIZE)
   };
 
   const footprintSize = building.footprintSize ?? 2;
@@ -221,4 +258,25 @@ function getBuildingCells(building) {
   }
 
   return [`${center.x},${center.z}`];
+}
+
+function normalizeConveyor(conveyor) {
+  conveyor.direction = directionVectors[conveyor.direction] ? conveyor.direction : "east";
+  conveyor.transferInterval = Number.isFinite(conveyor.transferInterval) && conveyor.transferInterval > 0 ? conveyor.transferInterval : 1;
+  conveyor.transferTimer = Number.isFinite(conveyor.transferTimer) && conveyor.transferTimer >= 0 ? conveyor.transferTimer : 0;
+
+  if (conveyor.carriedItem && !isValidCarriedItem(conveyor.carriedItem)) {
+    conveyor.carriedItem = null;
+  }
+}
+
+function normalizeMachineBuffers(machine) {
+  machine.inputBuffer ??= {};
+  machine.outputBuffer ??= {};
+  machine.inputCapacity = Number.isFinite(machine.inputCapacity) && machine.inputCapacity > 0 ? machine.inputCapacity : 20;
+  machine.outputCapacity = Number.isFinite(machine.outputCapacity) && machine.outputCapacity > 0 ? machine.outputCapacity : 20;
+}
+
+function isValidCarriedItem(item) {
+  return Boolean(item?.resourceId && Number.isFinite(item.amount) && item.amount > 0);
 }
