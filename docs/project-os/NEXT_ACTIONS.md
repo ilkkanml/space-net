@@ -1,58 +1,77 @@
 # NEXT ACTIONS
 
-Current State:
-v0.1.0 First Playable Prototype completed and internally approved.
+--------------------------------------------------
+CURRENT PROJECT STATE
+--------------------------------------------------
 
-Current Expansion State:
-v0.2.0 Milestone 11 implemented.
-QA validation pending.
+v0.1.0:
+STATUS: QA APPROVED / LOCKED
+
+v0.2.0:
+STATUS: ACTIVE DEVELOPMENT
+
+Current phase:
+QA Stabilization
+
+Milestone 11:
+USER TEST PASSED / QA PENDING
+
+Milestone 12:
+USER TEST PASSED / QA PENDING
 
 --------------------------------------------------
 IMMEDIATE PRIORITIES
 --------------------------------------------------
 
-1. Milestone 11 QA Validation
-- Validate all new recipes
-- Validate multi-input production
-- Validate save/load compatibility
-- Validate conveyor compatibility
-- Validate long-session stability
+1. v0.2 Internal QA Pass
+- Validate conveyor-heavy layouts
+- Validate long-session runtime stability
+- Validate save/load regression
+- Validate remove mode interaction safety
+- Validate recipe switching stability
+- Validate stale selection cleanup
+- Validate selected highlight sync
 
-2. Machine Readability Upgrade
-- Machine selection improvements
-- Machine detail panel
-- Recipe visibility improvements
-- Input/output readability improvements
-- Progress readability improvements
-- Status readability improvements
+2. Stability & Safety
+- Prevent stale UI references
+- Validate machine detail refresh timing
+- Validate deleted-building cleanup
+- Validate migration-safe save/load flow
+- Observe performance degradation over time
 
-3. Technical Cleanup
-- Cleanup/refactor review
-- Remove temporary debug remnants
-- Validate modular architecture consistency
-- Preserve v0.1 gameplay loop stability
+3. UX / Readability Polish
+- Machine highlight polish
+- Status readability polish
+- Panel readability cleanup
+- Conveyor readability polish
+- Selection clarity improvements
 
 --------------------------------------------------
-NEXT TARGET VERSION
+NEXT TARGET AFTER QA
 --------------------------------------------------
 
 Target:
-v0.2.0 — Machine Detail UI
+v0.2 QA PASS preparation
 
-Planned Focus:
-- Machine selection
-- Selected highlight
-- Machine detail panel
-- Recipe selection UI
-- Input slots
-- Output slots
-- Progress bar
-- Machine status visibility
+Focus:
+- Final stabilization
+- Final cleanup
+- Final usability review
+- Final regression review
 
 --------------------------------------------------
-IMPORTANT RULE
+IMPORTANT RULES
 --------------------------------------------------
 
-Do not expand advanced systems before preserving v0.1 gameplay loop stability.
+Do not expand advanced systems before v0.2 stabilization is complete.
 
-Do not implement real energy simulation before official energy milestone.
+Do not implement:
+- real energy simulation
+- upgrade systems
+- research tree
+- backend
+- market
+- multiplayer
+- advanced logistics
+
+Protect foundation stability first.
