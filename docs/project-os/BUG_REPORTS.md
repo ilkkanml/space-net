@@ -16,6 +16,9 @@ RESOLVED THIS SESSION
 - Selection panel stale deleted-building protection added
 - Selected building highlight activation completed
 - Build label corrected from Milestone 09 to v0.2 QA Stabilization
+- Storage state malformed save guard added
+- Storage capacity fallback added
+- Storage item transfer validation strengthened
 
 --------------------------------------------------
 KNOWN RISK AREAS
@@ -55,6 +58,7 @@ Current v0.2 build successfully:
 - supports machine detail readability layer
 - preserves persistence foundation
 - supports legacy v0.1 save migration
+- guards against malformed storage state
 
 No confirmed runtime blocker currently reported.
 
