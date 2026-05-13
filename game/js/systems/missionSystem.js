@@ -1,36 +1,51 @@
 import { gameState, notifyStateChanged, removeResource } from "../core/gameState.js";
 import { missions } from "../data/missions.js";
+import { resources } from "../data/resources.js";
 
 let statusCallback = null;
 
 export function initMissionSystem({ onStatus }) {
   statusCallback = onStatus;
+  normalizeMissionState();
 }
 
 export function updateMissions() {
+  normalizeMissionState();
+
   const mission = getCurrentMission();
   if (!mission) return;
 
-  if (mission.type === "collect") {
-    updateCollectMission(mission);
+  if (mission.type !== "collect") return;
+
+  if (isCollectMissionComplete(mission)) {
+    completeActiveMission(mission.id);
   }
 }
 
 export function contactNexus() {
+  normalizeMissionState();
+
+  const mission = getCurrentMission();
+  if (mission?.type === "contact") {
+    completeActiveMission(mission.id);
+    statusCallback?.("NEXUS contact established");
+  }
+
   return getCurrentMission();
 }
 
 export function canDeliverToNexusNow() {
-  const mission = getCurrentMission();
+  normalizeMissionState();
 
+  const mission = getCurrentMission();
   if (!mission || mission.type !== "deliver") return false;
 
-  return Object.entries(mission.requirements ?? {}).every(([resourceId, amount]) => {
-    return (gameState.resources[resourceId] ?? 0) >= amount;
-  });
+  return hasRequiredResources(mission);
 }
 
 export function deliverCurrentMissionToNexus() {
+  normalizeMissionState();
+
   const mission = getCurrentMission();
 
   if (!mission || mission.type !== "deliver") {
@@ -38,19 +53,22 @@ export function deliverCurrentMissionToNexus() {
     return false;
   }
 
-  if (!canDeliverToNexusNow()) {
+  if (!hasRequiredResources(mission)) {
     statusCallback?.("Insufficient resources for delivery");
     return false;
   }
 
+  gameState.missions.deliveryProgress[mission.id] ??= {};
+
   Object.entries(mission.requirements ?? {}).forEach(([resourceId, amount]) => {
     removeResource(resourceId, amount);
-
-    gameState.missions.deliveryProgress[mission.id] ??= {};
-    gameState.missions.deliveryProgress[mission.id][resourceId] = amount;
+    gameState.missions.deliveryProgress[mission.id][resourceId] =
+      (gameState.missions.deliveryProgress[mission.id][resourceId] ?? 0) + amount;
   });
 
-  completeMission(mission.id);
+  if (isDeliveryMissionComplete(mission)) {
+    completeActiveMission(mission.id);
+  }
 
   statusCallback?.("NEXUS delivery complete");
   notifyStateChanged();
@@ -59,40 +77,30 @@ export function deliverCurrentMissionToNexus() {
 }
 
 export function getMissionDisplay() {
+  normalizeMissionState();
+
   const mission = getCurrentMission();
 
   if (!mission) {
     return {
       title: "No Active Mission",
-      objectives: [],
-      description: ""
-    };
-  }
-
-  if (mission.type === "collect") {
-    return {
-      title: mission.title,
-      description: mission.description,
-      objectives: Object.entries(mission.requirements ?? {}).map(([resourceId, amount]) => ({
-        label: `Collect ${resourceId}`,
-        current: Math.min(gameState.resources[resourceId] ?? 0, amount),
-        required: amount
-      }))
+      description: "",
+      progressLines: [],
+      complete: true
     };
   }
 
   return {
     title: mission.title,
     description: mission.description,
-    objectives: Object.entries(mission.requirements ?? {}).map(([resourceId, amount]) => ({
-      label: `Deliver ${resourceId}`,
-      current: gameState.missions.deliveryProgress?.[mission.id]?.[resourceId] ?? 0,
-      required: amount
-    }))
+    progressLines: getProgressLines(mission),
+    complete: false
   };
 }
 
 export function getNexusDisplay() {
+  normalizeMissionState();
+
   return {
     level: gameState.nexus.level,
     memory: gameState.nexus.memoryFragments.length,
@@ -100,33 +108,96 @@ export function getNexusDisplay() {
   };
 }
 
-function updateCollectMission(mission) {
-  const completed = Object.entries(mission.requirements ?? {}).every(([resourceId, amount]) => {
-    return (gameState.resources[resourceId] ?? 0) >= amount;
-  });
-
-  if (completed) {
-    completeMission(mission.id);
+function getProgressLines(mission) {
+  if (mission.type === "contact") {
+    return ["Click NEXUS Core: 0/1"];
   }
+
+  return Object.entries(mission.requirements ?? {}).map(([resourceId, amount]) => {
+    const name = resources[resourceId]?.name ?? resourceId;
+    const label = mission.progressLabel ?? (mission.type === "deliver" ? "delivered" : "collected");
+    const current = getMissionProgressAmount(mission, resourceId, amount);
+
+    return `${name} ${current}/${amount} ${label}`;
+  });
 }
 
-function completeMission(missionId) {
-  if (gameState.missions.completedMissionIds.includes(missionId)) return;
+function getMissionProgressAmount(mission, resourceId, amount) {
+  if (mission.type === "collect") {
+    return Math.min(gameState.resources[resourceId] ?? 0, amount);
+  }
+
+  if (mission.type === "deliver") {
+    return Math.min(gameState.missions.deliveryProgress?.[mission.id]?.[resourceId] ?? 0, amount);
+  }
+
+  return 0;
+}
+
+function isCollectMissionComplete(mission) {
+  return Object.entries(mission.requirements ?? {}).every(([resourceId, amount]) => {
+    return (gameState.resources[resourceId] ?? 0) >= amount;
+  });
+}
+
+function isDeliveryMissionComplete(mission) {
+  return Object.entries(mission.requirements ?? {}).every(([resourceId, amount]) => {
+    return (gameState.missions.deliveryProgress?.[mission.id]?.[resourceId] ?? 0) >= amount;
+  });
+}
+
+function hasRequiredResources(mission) {
+  return Object.entries(mission.requirements ?? {}).every(([resourceId, amount]) => {
+    return (gameState.resources[resourceId] ?? 0) >= amount;
+  });
+}
+
+function completeActiveMission(missionId) {
+  normalizeMissionState();
+
+  if (gameState.missions.activeMissionId !== missionId) {
+    return false;
+  }
+
+  const currentIndex = missions.findIndex((mission) => mission.id === missionId);
+  if (currentIndex < 0) return false;
+
+  if (gameState.missions.completedMissionIds.includes(missionId)) {
+    return false;
+  }
 
   gameState.missions.completedMissionIds.push(missionId);
 
-  const currentIndex = missions.findIndex((mission) => mission.id === missionId);
   const nextMission = missions[currentIndex + 1];
-
-  if (nextMission) {
-    gameState.missions.activeMissionId = nextMission.id;
-  } else {
-    gameState.missions.activeMissionId = null;
-  }
+  gameState.missions.activeMissionId = nextMission?.id ?? null;
 
   notifyStateChanged();
+  return true;
 }
 
 function getCurrentMission() {
   return missions.find((mission) => mission.id === gameState.missions.activeMissionId) ?? null;
+}
+
+function normalizeMissionState() {
+  gameState.missions ??= {};
+  gameState.missions.completedMissionIds = Array.isArray(gameState.missions.completedMissionIds)
+    ? gameState.missions.completedMissionIds
+    : [];
+  gameState.missions.deliveryProgress =
+    gameState.missions.deliveryProgress && typeof gameState.missions.deliveryProgress === "object"
+      ? gameState.missions.deliveryProgress
+      : {};
+
+  if (!missions.some((mission) => mission.id === gameState.missions.activeMissionId)) {
+    gameState.missions.activeMissionId = missions[0]?.id ?? null;
+  }
+
+  const activeIndex = missions.findIndex((mission) => mission.id === gameState.missions.activeMissionId);
+  if (activeIndex < 0) return;
+
+  gameState.missions.completedMissionIds = gameState.missions.completedMissionIds.filter((missionId) => {
+    const index = missions.findIndex((mission) => mission.id === missionId);
+    return index >= 0 && index < activeIndex;
+  });
 }
