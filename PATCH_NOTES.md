@@ -1,28 +1,29 @@
-# S.P.A.C.E. NET v0.2 Stabilization Guard Patch
+# S.P.A.C.E. NET — Developer Debug Reset Patch
 
 Changed files:
-- game/js/systems/productionSystem.js
 - game/js/systems/saveLoadSystem.js
-- game/js/systems/conveyorSystem.js
-- game/js/ui/selectionPanel.js
 
 Scope:
-- Minimal invasive guard patch only.
-- No core loop rewrite.
+- Adds console-only developer debug command:
+  - window.spaceNetDebugResetProgress()
+- Keeps existing window.spaceNetDebugClearSave()
+- No public UI reset button.
 - No save key change.
-- No recipe format expansion.
-- No UI layout expansion.
-- No conveyor path algorithm change.
+- No gameplay reset feature.
+- Existing save/load flow preserved.
+
+Integration:
+Copy the included game/ folder over the existing project game/ folder.
 
 Commit:
-fix: stabilize v0.2 production guards
+chore: add developer debug progress reset
 
 Test:
-1. Load existing v0.1/v0.2 save.
-2. Produce Iron Plate and Copper Wire.
-3. Produce Iron Rod, Copper Cable, Basic Frame.
-4. Switch processor recipe while input buffer has old resource.
-5. Confirm incompatible stale input does not block new recipe.
-6. Fill output buffer and confirm machine shows OUTPUT BLOCKED, not stuck WORKING.
-7. Conveyor chain transfers single items without duplication.
-8. Save, refresh, load, continue production.
+1. Start local server.
+2. Open browser console.
+3. Type window.spaceNetDebugResetProgress()
+4. Confirm console message appears.
+5. Refresh page.
+6. Confirm clean local state loads.
+7. Confirm no reset button appears in UI.
+8. Save/load still works after new save.

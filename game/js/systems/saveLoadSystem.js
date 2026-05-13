@@ -63,10 +63,19 @@ export function tryAutoLoadGame() {
 
 export function installDeveloperDebugClearSave() {
   window.spaceNetDebugClearSave = () => {
-    localStorage.removeItem(SAVE_KEY);
-    LEGACY_SAVE_KEYS.forEach((key) => localStorage.removeItem(key));
+    clearAllKnownSaves();
     console.info("S.P.A.C.E. NET debug save cleared. Reload the page to start from a clean local state.");
   };
+
+  window.spaceNetDebugResetProgress = () => {
+    clearAllKnownSaves();
+    console.info("S.P.A.C.E. NET developer debug progress reset complete. Reload the page to start from a clean local state.");
+  };
+}
+
+function clearAllKnownSaves() {
+  localStorage.removeItem(SAVE_KEY);
+  LEGACY_SAVE_KEYS.forEach((key) => localStorage.removeItem(key));
 }
 
 function getSavedGameRaw() {
