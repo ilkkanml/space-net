@@ -1,7 +1,7 @@
 # CHANGELOG
 
 ## [v0.2.0] — Milestone 12 Machine Detail UI
-STATUS: USER TEST PASSED / QA PENDING
+STATUS: IMPLEMENTED / QA PENDING
 
 Machine readability layer implemented without rewriting the production loop.
 
@@ -14,8 +14,6 @@ Machine readability layer implemented without rewriting the production loop.
 - Status pill display
 - Machine power placeholder text: Not active in v0.2
 - Responsive machine detail panel cleanup
-- Selected building highlight
-- Stale selection guard
 
 ### Improved
 - Machine selection readability
@@ -23,32 +21,20 @@ Machine readability layer implemented without rewriting the production loop.
 - Input/output buffer visibility
 - Missing input / output blocked / working state visibility
 - Selection panel empty state
-- Remove mode interaction safety
-- Legacy v0.1 save key migration
-- Visible build label updated to v0.2 QA Stabilization
 
 ### Fixed
 - Restored base CSS after machine UI style overwrite
 - Preserved HUD, build menu, save/load panel and remove mode styles
-- Restored main loop after accidental truncation
-- Guarded selection panel against stale deleted buildings
-- Supported legacy v0.1 save key migration
-
-### User Test Result
-- v0.2 build opens locally.
-- Visible build label corrected after local/cache refresh.
-- Machine Detail UI did not block runtime.
-- No blocker reported by user.
 
 ### Scope Guard
 - No real energy system added
 - No upgrade system added
 - No overclocking added
 - No production statistics screen added
-- No gameplay power system added
+- No save structure rewrite added
 
 ### QA Status
-Pending QA validation.
+Pending user/QA validation.
 
 ---
 

@@ -17,7 +17,7 @@ function renderMissionPanel() {
 
   const label = document.createElement("div");
   label.className = "label";
-  label.textContent = "Current Objective";
+  label.textContent = display.complete ? "Completed Objective" : "Current Objective";
 
   const title = document.createElement("div");
   title.className = "mission-title";
@@ -30,7 +30,7 @@ function renderMissionPanel() {
   const progress = document.createElement("div");
   progress.className = "mission-progress";
 
-  display.progressLines.forEach((line) => {
+  (display.progressLines ?? []).forEach((line) => {
     const row = document.createElement("div");
     row.textContent = line;
     progress.append(row);
@@ -41,7 +41,7 @@ function renderMissionPanel() {
   if (display.complete) {
     const complete = document.createElement("div");
     complete.className = "mission-complete";
-    complete.textContent = "Internal v0.1 mission pass complete.";
+    complete.textContent = `Mission complete: ${display.title}`;
     missionPanelEl.append(complete);
   }
 }

@@ -64,7 +64,7 @@ export function deliverCurrentMissionToNexus() {
   Object.entries(mission.requirements ?? {}).forEach(([resourceId, amount]) => {
     removeResource(resourceId, amount);
     gameState.missions.deliveryProgress[mission.id][resourceId] =
-      (gameState.missions.deliveryProgress[mission.id][resourceId] ?? 0) + amount;
+      clampProgress((gameState.missions.deliveryProgress[mission.id][resourceId] ?? 0) + amount, amount);
   });
 
   if (isDeliveryMissionComplete(mission)) {
@@ -102,10 +102,13 @@ export function getMissionDisplay() {
 export function getNexusDisplay() {
   normalizeMissionState();
 
+  const mission = getCurrentMission();
+
   return {
     level: gameState.nexus.level,
     memory: gameState.nexus.memoryFragments.length,
-    activeMission: getCurrentMission()?.title ?? "None"
+    activeMission: mission?.title ?? "None",
+    progressLines: mission ? getProgressLines(mission) : []
   };
 }
 
@@ -119,8 +122,12 @@ export function normalizeMissionState() {
       ? gameState.missions.deliveryProgress
       : {};
 
+  if (gameState.missions.activeMissionId === null) {
+    return;
+  }
+
   if (!missions.some((mission) => mission.id === gameState.missions.activeMissionId)) {
-    gameState.missions.activeMissionId = firstMissionId;
+    gameState.missions.activeMissionId = getFirstIncompleteMissionId();
   }
 
   const activeIndex = missions.findIndex((mission) => mission.id === gameState.missions.activeMissionId);
@@ -139,6 +146,14 @@ export function normalizeMissionState() {
   });
 }
 
+function getFirstIncompleteMissionId() {
+  const nextMission = missions.find((mission) => {
+    return !gameState.missions.completedMissionIds.includes(mission.id);
+  });
+
+  return nextMission?.id ?? firstMissionId;
+}
+
 function getProgressLines(mission) {
   if (mission.type === "contact") {
     return ["NEXUS contact 0/1"];
@@ -153,16 +168,22 @@ function getProgressLines(mission) {
   });
 }
 
-function getMissionProgressAmount(mission, resourceId, amount) {
+function getMissionProgressAmount(mission, resourceId, requiredAmount) {
   if (mission.type === "collect") {
-    return Math.min(gameState.resources[resourceId] ?? 0, amount);
+    return clampProgress(gameState.resources[resourceId] ?? 0, requiredAmount);
   }
 
   if (mission.type === "deliver") {
-    return Math.min(gameState.missions.deliveryProgress?.[mission.id]?.[resourceId] ?? 0, amount);
+    return clampProgress(gameState.missions.deliveryProgress?.[mission.id]?.[resourceId] ?? 0, requiredAmount);
   }
 
   return 0;
+}
+
+function clampProgress(value, requiredAmount) {
+  const safeValue = Number.isFinite(value) ? value : 0;
+  const safeRequired = Number.isFinite(requiredAmount) ? requiredAmount : 0;
+  return Math.max(0, Math.min(safeValue, safeRequired));
 }
 
 function isCollectMissionComplete(mission) {

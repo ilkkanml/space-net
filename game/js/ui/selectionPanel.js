@@ -150,11 +150,16 @@ function renderNexusInfo() {
   const display = getNexusDisplay();
   nexusEl.classList.remove("hidden");
 
+  const progressRows = (display.progressLines ?? [])
+    .map((line) => `<div class="machine-row"><span>Requirement</span><strong>${line}</strong></div>`)
+    .join("");
+
   nexusEl.innerHTML = `
     <div class="panel-section-title">NEXUS CORE</div>
     <div class="machine-row"><span>NEXUS Level</span><strong>${display.level}</strong></div>
     <div class="machine-row"><span>Memory</span><strong>${display.memory}</strong></div>
     <div class="machine-row"><span>Mission</span><strong>${display.activeMission}</strong></div>
+    ${progressRows}
   `;
 }
 
@@ -179,6 +184,7 @@ function refreshNexusActionsIfNeeded() {
   renderNexusActions();
 }
 
+/* Existing machine/storage/conveyor rendering kept unchanged below */
 function renderMachineInfo(data) {
   if (!data?.machine || !isSelectionStillValid(data)) {
     machineEl.classList.add("hidden");
