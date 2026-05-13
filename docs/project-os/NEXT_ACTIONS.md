@@ -23,7 +23,37 @@ Primary QA file:
 `docs/project-os/V0_2_QA_CHECKLIST.md`
 
 --------------------------------------------------
-IMMEDIATE PRIORITIES
+IMMEDIATE PRIORITY — ACTIVE BLOCKER
+--------------------------------------------------
+
+HIGH PRIORITY:
+Fix mission progression duplicate completion bug.
+
+Required investigation:
+- duplicate mission completion trigger
+- legacy v0.1 completion path
+- objective panel overwrite timing
+- mission transition sequencing
+- delivery completion authority
+- activeMissionId enforcement
+
+Required repo inspection next session:
+- game/js/systems/missionSystem.js
+- game/js/ui/missionPanel.js
+- game/js/data/missions.js
+- game/js/systems/evaNotificationSystem.js
+- game/js/systems/saveLoadSystem.js
+
+Do NOT:
+- mark QA PASS
+- mark LOCKED
+- expand v0.2 scope
+- add new systems
+
+Until blocker is resolved and user retest passes.
+
+--------------------------------------------------
+SECONDARY PRIORITIES
 --------------------------------------------------
 
 1. Run v0.2 QA Checklist
@@ -38,12 +68,7 @@ IMMEDIATE PRIORITIES
 - Long Session Stability Test
 - Scope Guard Verification
 
-2. Log QA Result
-- If blocker found: update BUG_REPORTS.md
-- If no blocker: mark checklist conclusion as QA PASSED WITH NON-BLOCKING POLISH or QA PASSED
-- Do not mark LOCKED until QA result is complete
-
-3. Stabilization Fixes Only
+2. Stabilization Fixes Only
 - Fix runtime blockers
 - Fix save/load regressions
 - Fix stale selection crashes
@@ -84,7 +109,7 @@ Status:
 BACKLOG — future studio tooling.
 
 --------------------------------------------------
-NEXT TARGET AFTER QA
+NEXT TARGET AFTER BLOCKER FIX
 --------------------------------------------------
 
 Target:
