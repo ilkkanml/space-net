@@ -149,7 +149,18 @@ function pullItemFromSource(source, resourceId, amount) {
   if (!source || !resourceId || amount <= 0) return false;
 
   if (source.conveyor?.carriedItem?.resourceId === resourceId) {
-    source.conveyor.carriedItem = null;
+    normalizeConveyor(source.conveyor);
+
+    if (!source.conveyor.carriedItem || source.conveyor.carriedItem.amount < amount) {
+      return false;
+    }
+
+    source.conveyor.carriedItem.amount -= amount;
+
+    if (source.conveyor.carriedItem.amount <= 0) {
+      source.conveyor.carriedItem = null;
+    }
+
     return true;
   }
 

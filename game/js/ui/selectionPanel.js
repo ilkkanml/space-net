@@ -277,7 +277,12 @@ function addRecipeSelector(data) {
   select.addEventListener("change", () => {
     if (!select.value || !isSelectionStillValid(data)) return;
     normalizeMachineState(data);
-    setRecipe(data, select.value);
+
+    if (!setRecipe(data, select.value)) {
+      select.value = data.machine.recipeId ?? "";
+      return;
+    }
+
     renderMachineInfo(data);
   });
 

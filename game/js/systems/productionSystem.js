@@ -53,15 +53,25 @@ export function createMachineState(definition, extra = {}) {
 }
 
 export function setRecipe(building, recipeId) {
-  if (!building?.machine || building.machine.kind !== "processor") return;
-  if (!recipes[recipeId]) return;
+  if (!building?.machine || building.machine.kind !== "processor") return false;
+  if (!recipes[recipeId]) return false;
 
   normalizeMachineState(building.machine);
 
+  const recipe = recipes[recipeId];
+  const previousRecipeId = building.machine.recipeId;
+
   building.machine.recipeId = recipeId;
   building.machine.progress = 0;
-  building.machine.duration = recipes[recipeId]?.duration ?? building.machine.duration;
+  building.machine.duration = recipe.duration ?? building.machine.duration;
+  building.machine.status = MACHINE_STATUS.IDLE;
+
+  if (previousRecipeId !== recipeId) {
+    returnStaleInputsToInventory(building.machine, recipe);
+  }
+
   notifyStateChanged();
+  return true;
 }
 
 export function loadRecipeInputFromInventory(building) {
@@ -71,6 +81,8 @@ export function loadRecipeInputFromInventory(building) {
 
   const recipe = recipes[building.machine.recipeId];
   if (!recipe) {
+    building.machine.status = MACHINE_STATUS.NO_RECIPE;
+    building.machine.progress = 0;
     statusCallback?.("No recipe selected");
     return false;
   }
@@ -121,6 +133,7 @@ export function collectMachineOutput(building) {
     building.machine.outputBuffer[resourceId] = 0;
   });
 
+  normalizeBuffer(building.machine.outputBuffer);
   notifyStateChanged();
   return true;
 }
@@ -143,6 +156,36 @@ export function getMachineDisplay(machine) {
   };
 }
 
+export function normalizeLoadedProductionState(buildings) {
+  if (!Array.isArray(buildings)) return;
+
+  buildings.forEach((building) => {
+    if (!building?.machine) return;
+
+    normalizeMachineState(building.machine);
+
+    if (building.machine.kind !== "processor") return;
+
+    const recipe = recipes[building.machine.recipeId];
+    if (!recipe) {
+      building.machine.recipeId = null;
+      building.machine.status = MACHINE_STATUS.NO_RECIPE;
+      building.machine.progress = 0;
+      return;
+    }
+
+    building.machine.duration = recipe.duration ?? building.machine.duration;
+    removeInvalidRecipeInputs(building.machine, recipe);
+
+    if (!hasRecipeInput(building.machine, recipe) || !hasOutputSpace(building.machine, recipe)) {
+      building.machine.progress = 0;
+      building.machine.status = hasOutputSpace(building.machine, recipe)
+        ? MACHINE_STATUS.INPUT_SHORTAGE
+        : MACHINE_STATUS.OUTPUT_FULL;
+    }
+  });
+}
+
 function updateMiner(building, deltaTime) {
   const machine = building.machine;
   const resourceId = machine.outputResourceId;
@@ -155,6 +198,7 @@ function updateMiner(building, deltaTime) {
 
   if (getBufferTotal(machine.outputBuffer) >= machine.outputCapacity) {
     machine.status = MACHINE_STATUS.OUTPUT_FULL;
+    machine.progress = 0;
     return;
   }
 
@@ -190,6 +234,8 @@ function updateProcessor(building, deltaTime) {
     return;
   }
 
+  removeInvalidRecipeInputs(machine, recipe);
+
   if (!hasRecipeInput(machine, recipe)) {
     machine.status = MACHINE_STATUS.INPUT_SHORTAGE;
     machine.progress = 0;
@@ -198,6 +244,7 @@ function updateProcessor(building, deltaTime) {
 
   if (!hasOutputSpace(machine, recipe)) {
     machine.status = MACHINE_STATUS.OUTPUT_FULL;
+    machine.progress = 0;
     return;
   }
 
@@ -206,27 +253,47 @@ function updateProcessor(building, deltaTime) {
 
   let steps = 0;
   while (machine.progress >= recipe.duration && steps < MAX_PRODUCTION_STEPS_PER_TICK) {
-    if (!hasRecipeInput(machine, recipe) || !hasOutputSpace(machine, recipe)) {
+    if (!completeRecipeStep(machine, recipe)) {
       machine.progress = 0;
+      machine.status = hasOutputSpace(machine, recipe)
+        ? MACHINE_STATUS.INPUT_SHORTAGE
+        : MACHINE_STATUS.OUTPUT_FULL;
       break;
     }
 
     machine.progress -= recipe.duration;
     steps += 1;
-
-    getRecipeInputs(recipe).forEach(({ resourceId, amount }) => {
-      machine.inputBuffer[resourceId] = Math.max(0, (machine.inputBuffer[resourceId] ?? 0) - amount);
-    });
-
-    Object.entries(recipe.output).forEach(([resourceId, amount]) => {
-      if (amount <= 0) return;
-      machine.outputBuffer[resourceId] = (machine.outputBuffer[resourceId] ?? 0) + amount;
-    });
   }
 
   if (steps >= MAX_PRODUCTION_STEPS_PER_TICK) {
     machine.progress = 0;
   }
+}
+
+function completeRecipeStep(machine, recipe) {
+  const inputs = getRecipeInputs(recipe);
+  const outputs = Object.entries(recipe.output ?? {}).filter(([, amount]) => amount > 0);
+
+  const hasAllInputs = inputs.every(({ resourceId, amount }) => {
+    return (machine.inputBuffer[resourceId] ?? 0) >= amount;
+  });
+
+  const outputTotal = outputs.reduce((sum, [, amount]) => sum + amount, 0);
+  const hasSpace = getBufferTotal(machine.outputBuffer) + outputTotal <= machine.outputCapacity;
+
+  if (!hasAllInputs || !hasSpace) return false;
+
+  inputs.forEach(({ resourceId, amount }) => {
+    machine.inputBuffer[resourceId] -= amount;
+  });
+
+  outputs.forEach(([resourceId, amount]) => {
+    machine.outputBuffer[resourceId] = (machine.outputBuffer[resourceId] ?? 0) + amount;
+  });
+
+  normalizeBuffer(machine.inputBuffer);
+  normalizeBuffer(machine.outputBuffer);
+  return true;
 }
 
 function hasRecipeInput(machine, recipe) {
@@ -251,6 +318,28 @@ function hasInventoryForRecipe(recipe) {
   return getRecipeInputs(recipe).every(({ resourceId, amount }) => {
     return gameState.resources[resourceId] >= amount;
   });
+}
+
+function returnStaleInputsToInventory(machine, recipe) {
+  const allowedInputs = new Set(getRecipeInputs(recipe).map((input) => input.resourceId));
+
+  Object.entries(machine.inputBuffer ?? {}).forEach(([resourceId, amount]) => {
+    if (allowedInputs.has(resourceId)) return;
+    if (amount > 0) addResource(resourceId, amount);
+    delete machine.inputBuffer[resourceId];
+  });
+
+  normalizeBuffer(machine.inputBuffer);
+}
+
+function removeInvalidRecipeInputs(machine, recipe) {
+  const allowedInputs = new Set(getRecipeInputs(recipe).map((input) => input.resourceId));
+
+  Object.keys(machine.inputBuffer ?? {}).forEach((resourceId) => {
+    if (!allowedInputs.has(resourceId)) delete machine.inputBuffer[resourceId];
+  });
+
+  normalizeBuffer(machine.inputBuffer);
 }
 
 function getBufferTotal(buffer) {
