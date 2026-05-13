@@ -1,29 +1,18 @@
-# S.P.A.C.E. NET — Developer Debug Reset Patch
+Commit:
+fix: prevent EVA runtime from resetting mission progress
 
 Changed files:
-- game/js/systems/saveLoadSystem.js
-
-Scope:
-- Adds console-only developer debug command:
-  - window.spaceNetDebugResetProgress()
-- Keeps existing window.spaceNetDebugClearSave()
-- No public UI reset button.
-- No save key change.
-- No gameplay reset feature.
-- Existing save/load flow preserved.
+- game/js/systems/evaNotificationSystem.js
 
 Integration:
-Copy the included game/ folder over the existing project game/ folder.
-
-Commit:
-chore: add developer debug progress reset
+Replace existing evaNotificationSystem.js with patched version.
 
 Test:
-1. Start local server.
-2. Open browser console.
-3. Type window.spaceNetDebugResetProgress()
-4. Confirm console message appears.
-5. Refresh page.
-6. Confirm clean local state loads.
-7. Confirm no reset button appears in UI.
-8. Save/load still works after new save.
+1. Start fresh save.
+2. Collect Iron Ore until 20/20.
+3. Collect Copper Ore until 10/10.
+4. Confirm objectives no longer reset to 0/20 and 0/10.
+5. Wait for idle runtime line.
+6. Trigger missing input runtime line.
+7. Confirm old E.V.A. one-time messages still appear.
+8. Save/load test.
