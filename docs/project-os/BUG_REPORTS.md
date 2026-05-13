@@ -1,41 +1,24 @@
-# BUG REPORTS
+# S.P.A.C.E. NET Studio — Bug Reports
 
-## v0.1.0 Final Internal QA Summary
+## Fixed
 
-STATUS:
-NO CRITICAL BLOCKER REMAINING
+### Mission Progression
+- duplicate mission completion fixed
+- delivery progression reset fixed
+- future mission leak fixed
+- objective reset bug fixed
+- progression order desync fixed
 
-FINAL QA RESULT:
-APPROVED / LOCKED
+### E.V.A.
+- notification spam risk reduced
+- runtime queue overlap stabilized
+- cooldown persistence stabilized
 
---------------------------------------------------
-RESOLVED DURING MILESTONE 10
---------------------------------------------------
+### UI
+- objective overflow fixed
+- progression readability improved
 
-- Camera control standardization issues
-- Conveyor drag placement inconsistencies
-- Remove mode toggle edge cases
-- Placement flow interruption cases
-- Save/load persistence validation issues
-- Browser refresh persistence inconsistencies
-- UI interaction synchronization problems
-
---------------------------------------------------
-KNOWN NON-BLOCKING POLISH ITEMS
---------------------------------------------------
-
-Priority: LOW
-
-- Camera smoothing requires additional tuning
-- Conveyor visual readability can be improved
-- Selection/remove highlight feedback can be improved
-- UI transitions require polish
-- Panel animations require polish
-- Long-session performance observation required
-- General cleanup/refactor pass recommended
-
---------------------------------------------------
-QA CONCLUSION
---------------------------------------------------
-
-The current v0.1.0 build satisfies the intended First Playable Prototype scope and passes internal usability and persistence validation requirements.
+## Monitoring
+- long-session UI drift observation
+- notification overlap edge-case observation
+- conveyor saturation readability observation
