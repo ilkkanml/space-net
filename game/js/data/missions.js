@@ -4,7 +4,6 @@ export const missions = [
     title: "Contact NEXUS Core",
     description: "Click the NEXUS Core to establish the first command link.",
     type: "contact",
-    progressLabel: "NEXUS contact",
     requirements: {}
   },
   {

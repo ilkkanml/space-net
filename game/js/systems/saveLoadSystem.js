@@ -1,5 +1,6 @@
 import { gameState, replaceGameState, SAVE_VERSION, notifyStateChanged } from "../core/gameState.js";
 import { normalizeLoadedProductionState } from "./productionSystem.js";
+import { normalizeMissionState } from "./missionSystem.js";
 
 export const SAVE_KEY = "spaceNetSave_v0_2";
 const LEGACY_SAVE_KEYS = ["spaceNetSave_v0_1"];
@@ -40,6 +41,7 @@ export function loadGame() {
 
     replaceGameState(payload.gameState);
     normalizeLoadedProductionState(gameState.buildings);
+    normalizeMissionState();
     notifyStateChanged();
 
     if (saveRecord.key !== SAVE_KEY) {
