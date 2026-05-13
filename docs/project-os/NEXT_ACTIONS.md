@@ -1,24 +1,36 @@
-# S.P.A.C.E. NET Studio — Next Actions
+# S.P.A.C.E. NET — Next Actions
 
-## v0.3 Pre-Production
+## Immediate
 
-### Focus
-- blueprint progression
-- NEXUS evolution
-- Tier 0 → Tier 1 transition
-- controlled logistics growth
-- industrial continuity
+- Do not add new large systems.
+- Preserve v0.2 final freeze build.
+- Commit final game files and docs to GitHub.
+- Use this package as the v0.2 reference snapshot.
 
-### Watchlist
-- tonal erosion risk
-- excessive UI density
-- objective treadmill risk
-- notification escalation risk
-- aggressive progression pacing
+## Observation
 
-### Preservation Priority
-- silence-first continuity
-- calm pacing
-- restrained E.V.A.
-- conveyor observation comfort
-- low-noise UI
+- Long-session watch observation.
+- E.V.A. restraint monitoring.
+- Notification frequency monitoring.
+- Mission pacing observation.
+- UI calmness observation.
+- Conveyor/machine loop fatigue observation.
+
+## Future Direction
+
+Next phase should be scoped carefully.
+
+Allowed direction after freeze review:
+- v0.2 preservation-oriented cleanup only
+- small UI fade/calmness polish
+- E.V.A. line cleanup
+- documentation alignment
+
+Do not start:
+- Energy
+- Market
+- Research
+- Backend
+- Consortium
+- Advanced logistics
+until Director opens the next official milestone.
