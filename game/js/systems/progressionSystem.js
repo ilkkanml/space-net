@@ -33,18 +33,6 @@ export function unlockBlueprint(blueprintId) {
 
   gameState.progression.unlockedBlueprintIds.push(blueprintId);
   notifyStateChanged();
-
-  return true;
-}
-
-export function setNexusLevel(level) {
-  normalizeProgressionState();
-
-  const safeLevel = Number.isFinite(level) ? Math.max(1, level) : 1;
-  if (gameState.progression.nexusLevel === safeLevel) return false;
-
-  gameState.progression.nexusLevel = safeLevel;
-  notifyStateChanged();
   return true;
 }
 
