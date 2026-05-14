@@ -2,6 +2,7 @@ import { gameState } from "../core/gameState.js";
 import { getMissionDisplay } from "../systems/missionSystem.js";
 
 const missionPanelEl = document.querySelector("#mission-panel");
+const EVA_PANEL_SAFE_GAP_PX = 16;
 
 export function initMissionPanel() {
   renderMissionPanel();
@@ -49,6 +50,7 @@ function renderMissionPanel() {
   }
 
   missionPanelEl.append(createProgressionReadout());
+  updateEvaPanelAnchor();
 }
 
 function createProgressionReadout() {
@@ -88,4 +90,14 @@ function createProgressionReadout() {
   section.append(label, levelRow, blueprintRow);
 
   return section;
+}
+
+
+function updateEvaPanelAnchor() {
+  if (!missionPanelEl) return;
+
+  requestAnimationFrame(() => {
+    const missionBottom = missionPanelEl.offsetTop + missionPanelEl.offsetHeight + EVA_PANEL_SAFE_GAP_PX;
+    document.documentElement.style.setProperty("--eva-panel-top", `${missionBottom}px`);
+  });
 }

@@ -85,7 +85,7 @@ body,
 }
 
 .eva-panel {
-  top: 248px;
+  top: var(--eva-panel-top, 248px);
   left: 16px;
   width: 340px;
   min-height: 150px;
