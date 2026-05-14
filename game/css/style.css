@@ -487,3 +487,29 @@ body,
     grid-template-columns: 1fr;
   }
 }
+
+
+/* Milestone 13 — Passive Progression Presentation Layer */
+.progression-readout {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+
+.progression-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 6px;
+  color: rgba(233, 246, 255, 0.8);
+}
+
+.progression-row strong {
+  color: #ffffff;
+}
+
+.progression-locked {
+  color: #fcd34d;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+}

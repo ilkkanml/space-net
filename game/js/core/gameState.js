@@ -16,6 +16,12 @@ export function createInitialGameState() {
       level: 1,
       memoryFragments: []
     },
+    progression: {
+      nexusLevel: 1,
+      blueprints: {
+        basicAssembler: "LOCKED"
+      }
+    },
     missions: {
       activeMissionId: firstMissionId,
       completedMissionIds: [],
